@@ -1,4 +1,8 @@
+#include <vector>
+#include <string>
+
 #include "node.h"
+
 
 node::node() {
 	return;
@@ -46,4 +50,22 @@ void node::setDataSize(int dataSize) {
 
 int node::getDataSize() {
 	return this->dataSize;
+}
+
+void node::addEdge(node* nextNode) {
+	this->edges.push_back(nextNode);
+	return;
+}
+
+std::vector<node*> node::getEdges() {
+	return this->edges;
+}
+
+void node::addWeight(int weight) {
+	this->weights.push_back(weight);
+	return;
+}
+
+std::vector<int> node::getWeights() {
+	return this->weights;
 }

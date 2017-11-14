@@ -2,6 +2,7 @@
 #define NODE_H
 
 #include <string>
+#include <vector>
 
 class node {
 public:
@@ -15,11 +16,17 @@ public:
 	int getDataSize();
 	void setType(std::string type);
 	std::string getType();
+	void addEdge(node* nextNode);
+	std::vector<node*> getEdges();
+	void addWeight(int weight);
+	std::vector<int> getWeights();
 private:
 	std::string type;
 	std::string name;
 	bool SIGN;
 	int dataSize;
+	std::vector<node*> edges;
+	std::vector<int> weights;
 };
 
 #endif
