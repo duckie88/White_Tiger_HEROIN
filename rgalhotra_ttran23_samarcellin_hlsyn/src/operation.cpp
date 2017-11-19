@@ -10,14 +10,15 @@ operation::operation() {
 	this->delay = -1;
 }
 
-operation::operation(int start, std::string oper, node out, node in1, node in2, node var, int delay) {
+operation::operation(int start, std::string oper, node out, node in1, node in2, node var, int delay, bool cond) {
 	this->lineNum = start;
 	this->operType = oper;
 	this->output = out;	
 	this->input1 = in1;
 	this->input2 = in2;	
 	this->variable = var;	
-	this->delay = delay;	
+	this->delay = delay;
+	this->cond = cond;
 }
 
 // Getters
@@ -28,6 +29,7 @@ node operation::getInput2() { return this->input2; }
 node operation::getOutput() { return this->output; }
 node operation::getMuxSel() { return this->variable; }
 int operation::getDelay() { return this->delay; }
+bool operation::getConditional() { return this->cond; }
 
 // Setters. Probably won't see use but declared for consistency sake.
 void operation::setLineNum(int start) { this->lineNum = start; }
@@ -37,3 +39,4 @@ void operation::setInput2(node in2) { this->input2 = in2; }
 void operation::setOutput(node out) { this->output = out; }
 void operation::setMuxSel(node sel) { this->variable = sel; }
 void operation::setDelay(int num) { this->delay = num; }
+void operation::setConditional(bool cond) { this->cond = cond; }

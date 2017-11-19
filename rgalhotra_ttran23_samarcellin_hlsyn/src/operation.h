@@ -12,10 +12,11 @@ private:
 	node input2;	// For second input
 	node variable;	// For mux operations
 	int delay;	// The cycle time required: mul = 2 cycles, div/mod = 3 cycles, add/sub/logic/else = 1 cycle
+	bool cond; //if it's within a conditional
 public:
 	// Constructors
 	operation();
-	operation(int start, std::string oper, node out, node in1, node in2, node var, int delay);
+	operation(int start, std::string oper, node out, node in1, node in2, node var, int delay, bool cond);
 
 	// Methods
 	
@@ -27,6 +28,7 @@ public:
 	node getOutput();
 	node getMuxSel();
 	int getDelay();
+	bool getConditional();
 
 	// Setters. Probably won't see use but declared for consistency sake.
 	void setLineNum(int start);
@@ -36,6 +38,7 @@ public:
 	void setOutput(node out);
 	void setMuxSel(node sel);
 	void setDelay(int num);
+	void setConditional(bool cond);
 };
 
 #endif //OPERATION_H

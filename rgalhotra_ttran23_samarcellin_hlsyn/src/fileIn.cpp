@@ -87,7 +87,7 @@ int fileRead(char* fileName, std::vector<node>* unscheduledIO,
 				cond = false;
 			}
 			// For everything else
-			else if (results[1] == "=" && cond == false) {
+			else if (results[1] == "=") {
 				if (0) {	// If mux
 					printf("temp");
 				}
@@ -101,7 +101,7 @@ int fileRead(char* fileName, std::vector<node>* unscheduledIO,
 						return EXIT_FAILURE;
 					}
 					
-					(*unscheduledOperation).push_back(operation(lineNumber, results[3], tempOut, tempIn1, tempIn2, node(), tempDelay));
+					(*unscheduledOperation).push_back(operation(lineNumber, results[3], tempOut, tempIn1, tempIn2, node(), tempDelay, cond));
 				}
 			}
 		}
