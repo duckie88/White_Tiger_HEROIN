@@ -17,6 +17,7 @@ int fileRead(char* fileName, std::vector<node>* unscheduledIO,
 	bool SIGN = false;
 	int lineNumber = 0;		// For tracking when conditionals start/end
 	bool cond = false; //to skip conditional lines
+	bool nested = false;
 
 	inFS.open(fileName);//open input file
 	if (!inFS.is_open()) { //check opened correctly
@@ -77,13 +78,21 @@ int fileRead(char* fileName, std::vector<node>* unscheduledIO,
 				}
 			}
 			// For if-else conditional
-			else if ((results[0] == "if") || (results[0] == "else")) {
-				(*unscheduledConditional).push_back(conditional(results[0], lineNumber, results[2]));
+			else if (((results[0] == "if") || (results[0] == "else")) && !cond) {
+				(*unscheduledConditional).push_back(conditional(results[0], lineNumber, results[2], nested));
 				cond = true;
 			}
+			else if (((results[0] == "if") || (results[0] == "else")) && cond) {
+				nested = true;
+				(*unscheduledConditional).push_back(conditional(results[0], lineNumber, results[2], nested));
+			}
 			// For the ending parenthesis }
-			else if (results[0] == "}") {
-				(*unscheduledConditional).push_back(conditional(results[0], lineNumber, ""));
+			else if (results[0] == "}" && nested) {
+				(*unscheduledConditional).push_back(conditional(results[0], lineNumber, "", nested));
+				nested = false;
+			}
+			else if (results[0] == "}" && !nested) {
+				(*unscheduledConditional).push_back(conditional(results[0], lineNumber, "", nested));
 				cond = false;
 			}
 			// For everything else
