@@ -12,7 +12,7 @@ if(MSVC)
     add_definitions(-D_CRT_NONSTDC_NO_DEPRECATE)
 else()
     # adds debug information for all other OSs
-    add_definitions(-Wall -g)
+    add_definitions(-Wall -g -std=c++11)
 endif()
 
 file( GLOB SRCS *.cpp *.h )
@@ -21,5 +21,3 @@ file( GLOB SRCS *.cpp *.h )
 # and header files needed for the executable.
 
 add_executable( hlsyn ${SRCS} )
-
-set (CMAKE_CXX_STANDARD 11)

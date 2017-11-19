@@ -13,5 +13,3 @@ project (hlsyn)
 # will be used for further setting up the project.
 
 add_subdirectory( src )
-
-set (CMAKE_CXX_STANDARD 11)
