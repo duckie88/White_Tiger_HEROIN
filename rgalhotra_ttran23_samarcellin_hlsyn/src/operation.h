@@ -12,7 +12,7 @@ private:
 	node input2;	// For second input
 	node variable;	// For mux operations
 	int delay;	// The cycle time required: mul = 2 cycles, div/mod = 3 cycles, add/sub/logic/else = 1 cycle
-	bool cond; //if it's within a conditional
+	bool cond; // If it's within a conditional
 public:
 	// Constructors
 	operation();
