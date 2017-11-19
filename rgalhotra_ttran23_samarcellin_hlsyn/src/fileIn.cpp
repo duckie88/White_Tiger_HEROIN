@@ -16,6 +16,7 @@ int fileRead(char* fileName, std::vector<node>* unscheduledIO,
 	int SIZE = 0;
 	bool SIGN = false;
 	int lineNumber = 0;		// For tracking when conditionals start/end
+	bool cond = false; //to skip conditional lines
 
 	inFS.open(fileName);//open input file
 	if (!inFS.is_open()) { //check opened correctly
@@ -78,13 +79,15 @@ int fileRead(char* fileName, std::vector<node>* unscheduledIO,
 			// For if-else conditional
 			else if ((results[0] == "if") || (results[0] == "else")) {
 				(*unscheduledConditional).push_back(conditional(results[0], lineNumber, results[2]));
+				cond = true;
 			}
 			// For the ending parenthesis }
 			else if (results[0] == "}") {
 				(*unscheduledConditional).push_back(conditional(results[0], lineNumber, ""));
+				cond = false;
 			}
 			// For everything else
-			else if (results[1] == "=") {
+			else if (results[1] == "=" && cond == false) {
 				if (0) {	// If mux
 					printf("temp");
 				}
