@@ -1,71 +1,144 @@
-#include <vector>
-#include <string>
-
+	
 #include "node.h"
 
+node::node(){
+	return; //default constructor
+}
 
-node::node() {
+node::node(int nodeNum){
+	this->nodeNum = nodeNum;
+	visited = 'w';
+	delay = 0;
+	asapTime = -1;
+	alapTime = -1;
+	cyclesElapsed = 0;
+	scheduled = false;
+	conditional = false;
+}
+
+std::string node::getOperation(){
+	return this->operation;
+}
+
+void node::setOperation(std::string operation){
+	this->operation = operation;
 	return;
 }
 
-node::node(std::string type, std::string name, bool SIGN, int dataSize) {
-	this->type = type;
-	this->name = name;
-	this->SIGN = SIGN;
-	this->dataSize = dataSize;
+int node::getNodeNum(){
+	return nodeNum;
+}
+
+void node::setNodeNum(int nodeNum){
+	this->nodeNum = nodeNum;
 	return;
 }
 
-void node::setType(std::string type) {
-	this->type = type;
+std::vector<node*> node::getPrevNodes(){
+	return this->prevNodes;
+}
+
+void node::setPrevNodes(std::vector<node*> prevNodes){
+	this->prevNodes = prevNodes;
 	return;
 }
 
-std::string node::getType() {
-	return this->type;
+std::vector<node*> node::getNextNodes(){
+	return this->nextNodes;
 }
 
-void node::setName(std::string name) {
-	this->name = name;
+void node::setNextNodes(std::vector<node*> nextNodes){
+	this->nextNodes = nextNodes;
 	return;
 }
 
-std::string node::getName() {
-	return this->name;
+std::vector<node*> node::getNextIfNodes(){
+	return this->nextIfNodes;
 }
 
-void node::setSIGN(bool SIGN) {
-	this->SIGN = SIGN;
+void node::setNextIfNodes(std::vector<node*> nextIfNodes){
+	this->nextIfNodes = nextIfNodes;
 	return;
 }
 
-bool node::getSIGN() {
-	return this->SIGN;
+std::vector<node*> node::getNextElseNodes(){
+	return this->nextElseNodes;
 }
 
-void node::setDataSize(int dataSize) {
-	this->dataSize = dataSize;
+void node::setNextElseNodes(std::vector<node*> nextElseNodes){
+	this->nextElseNodes = nextElseNodes;
 	return;
 }
 
-int node::getDataSize() {
-	return this->dataSize;
+char node::getVisted(){
+	return this->visited;
 }
 
-void node::addEdge(node* nextNode) {
-	this->edges.push_back(nextNode);
+void node::setVisted(char visited){
+	this->visited = visited;
 	return;
 }
 
-std::vector<node*> node::getEdges() {
-	return this->edges;
+int node::getDelay(){
+	return this->delay;
 }
 
-void node::addWeight(int weight) {
-	this->weights.push_back(weight);
+void node::setDelay(int delay){
+	this->delay = delay;
 	return;
 }
 
-std::vector<int> node::getWeights() {
-	return this->weights;
+int node::getAsapTime(){
+	return this->asapTime;
+}
+
+void node::setAsapTime(int asapTime){
+	this->asapTime = asapTime;
+	return;
+}
+
+int node::getAlapTime(){
+	return this->alapTime;
+}
+
+void node::setAlapTime(int alapTime){
+	this->alapTime = alapTime;
+	return;
+}
+
+bool node::getScheduled(){
+	return this->scheduled;
+}
+
+void node::setScheduled(bool scheduled){
+	this->scheduled = scheduled;
+	return;
+}
+
+bool node::getConditional(){
+	return this->conditional;
+}
+
+void node::setConditional(bool conditional){
+	this->conditional = conditional;
+	return;
+}
+
+void node::addPrevNode(node* temp){
+	prevNodes.push_back(temp);
+	return;
+}
+
+void node::addNextNode(node* temp){
+	nextNodes.push_back(temp);
+	return;
+}
+
+int node::getCyclesElapsed(){
+	return this->cyclesElapsed;
+}
+
+void node::setCyclesElapsed(int cycles){
+	this->cyclesElapsed = cycles;
+	return;
 }

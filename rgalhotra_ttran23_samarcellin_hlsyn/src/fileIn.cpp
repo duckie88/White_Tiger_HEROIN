@@ -1,9 +1,8 @@
-#include "node.h"
+#include "variable.h"
 #include "fileIn.h"
+#include "node.h"
 
-int fileRead(char* fileName, std::vector<node>* unscheduledIO, 
-					std::vector<operation>* unscheduledOperation, 
-					std::vector<conditional>* unscheduledConditional) {
+int fileRead(char* fileName, std::vector<variable>* variables, std::vector<node>* unscheduledNodes) {
 
 	std::istringstream inSS;
 	std::ifstream inFS;
@@ -11,13 +10,16 @@ int fileRead(char* fileName, std::vector<node>* unscheduledIO,
 	std::string word;
 	std::vector<std::string> results;
 	std::string temp;
+	node edge;
 	unsigned int i = 0;
 	unsigned int j = 0;
+	int num = 1;
+	int input1, input2, input3, output;
 	int SIZE = 0;
+	int delay = 0;
 	bool SIGN = false;
-	int lineNumber = 0;		// For tracking when conditionals start/end
-	bool cond = false; //to skip conditional lines
-	bool nested = false;
+	bool ifFlag = false;
+	bool elseFlag = false;
 
 	inFS.open(fileName);//open input file
 	if (!inFS.is_open()) { //check opened correctly
@@ -73,51 +75,137 @@ int fileRead(char* fileName, std::vector<node>* unscheduledIO,
 					temp.erase(std::remove(temp.begin(), temp.end(), ','), temp.end());
 					results[i] = temp;
 					if (!(results[i] == " ") && !(results[i] == "")) {
-						(*unscheduledIO).push_back(node(results[0], results[i], SIGN, SIZE));
+						(*variables).push_back(variable(results[0], results[i], SIGN, SIZE));
+						(*unscheduledNodes).push_back(node(num));
+						num++;
 					}
 				}
 			}
+			//end input, output, variables
+
 			// For if-else conditional
-			else if (((results[0] == "if") || (results[0] == "else")) && !cond) {
-				(*unscheduledConditional).push_back(conditional(results[0], lineNumber, results[2], nested));
-				cond = true;
+			else if (results[0] == "if"){
+				ifFlag = true;
 			}
-			else if (((results[0] == "if") || (results[0] == "else")) && cond) {
-				nested = true;
-				(*unscheduledConditional).push_back(conditional(results[0], lineNumber, results[2], nested));
+			else if(results[0] == "}"){
+				ifFlag = false;
 			}
-			// For the ending parenthesis }
-			else if (results[0] == "}" && nested) {
-				(*unscheduledConditional).push_back(conditional(results[0], lineNumber, "", nested));
-				nested = false;
-			}
-			else if (results[0] == "}" && !nested) {
-				(*unscheduledConditional).push_back(conditional(results[0], lineNumber, "", nested));
-				cond = false;
-			}
+			//end if-else
+			
+			
+			
 			// For everything else
 			else if (results[1] == "=") {
-				if (0) {	// If mux
-					printf("temp");
-				}
-				else {
-					results[0].erase(std::remove(results[0].begin(), results[0].end(), '\t'), results[0].end());
-					node tempOut, tempIn1, tempIn2;
-					int tempDelay = findDelay(results[3]);
-					// Check that the three nodes are in the list
-					if (!findNode(results[0], &tempOut, unscheduledIO) || !findNode(results[2], &tempIn1, unscheduledIO) || !findNode(results[4], &tempIn2, unscheduledIO)) {
-						std::cout << "Error, cannot find variable used on line " << lineNumber << " of the netlist.\n";
-						return EXIT_FAILURE;
+				if(results[3] == "?") {
+					if(checkMux(results, *variables, &output, &input1, &input2, &input3)){
+						(*unscheduledNodes).at(output).setDelay(findDelay((*variables).at(output).getType())); //set delay
+						(*unscheduledNodes).at(output).addNextNode(&(*unscheduledNodes).at(output)); //set edges
+						(*unscheduledNodes).at(output).addPrevNode(&(*unscheduledNodes).at(input1));
+						(*unscheduledNodes).at(output).addPrevNode(&(*unscheduledNodes).at(input2));
+						(*unscheduledNodes).at(output).addPrevNode(&(*unscheduledNodes).at(input3));
 					}
-					
-					(*unscheduledOperation).push_back(operation(lineNumber, results[3], tempOut, tempIn1, tempIn2, node(), tempDelay, cond));
+					else{
+						EXIT_FAILURE;
+					}
+				}
+				else{
+					if(checkOperation(results, *variables, &output, &input1, &input2)){
+						(*unscheduledNodes).at(output).setDelay(findDelay((*variables).at(output).getType()));
+						(*unscheduledNodes).at(output).addNextNode(&(*unscheduledNodes).at(output));
+						(*unscheduledNodes).at(output).addPrevNode(&(*unscheduledNodes).at(input1));
+						(*unscheduledNodes).at(output).addPrevNode(&(*unscheduledNodes).at(input2));
+
+						//std::cout << (*unscheduledNodes).at(output).getOperation() << (*unscheduledNodes).at(output).getNodeNum()  << "\t" << std::endl; //test indexes returned right
+					}
+					else{
+						EXIT_FAILURE;
+					}
 				}
 			}
 		}
-		lineNumber++;	// Tracking how many lines we have, used for conditional tracking
 	}
 	return EXIT_SUCCESS;
 }
+
+
+bool checkMux(std::vector<std::string> results, std::vector<variable> variables, int* output, int* input1, int* input2, int* input3){
+	int i;
+	bool check1 = false;
+	bool check2 = false;
+	bool check3 = false;
+	bool check4 = false;
+
+	for(i = 0; i < variables.size(); i++){
+		if( results[0] == variables.at(i).getName()){
+			check1 = true;
+			*output = i;
+			break;
+		}
+	}
+	for(i = 0; i < variables.size(); i++){
+		if( results[2] == variables.at(i).getName()){
+			check2 = true;
+			*input1 = i;
+			break;
+		}
+	}
+	for(i = 0; i < variables.size(); i++){
+		if( results[4] == variables.at(i).getName()){
+			check3 = true;
+			*input2 = i;
+			break;
+		}
+	}
+	for(i = 0; i < variables.size(); i++){
+		if( results[6] == variables.at(i).getName()){
+			check4 = true;
+			*input3 = i;
+			break;
+		}
+	}
+
+	if( check1 == true && check2 == true && check3 == true && check4 == true ){
+		return true;
+	}
+
+	return false;
+}
+
+bool checkOperation(std::vector<std::string> results, std::vector<variable> variables, int* output, int* input1, int* input2){
+	int i;
+	bool check1 = false;
+	bool check2 = false;
+	bool check3 = false;
+
+	for(i = 0; i < variables.size(); i++){
+		if( results[0] == variables.at(i).getName()){
+			*output = i;
+			check1 = true;
+			break;
+		}
+	}
+	for(i = 0; i < variables.size(); i++){
+		if( results[2] == variables.at(i).getName()){
+			check2 = true;
+			*input1 = i;
+			break;
+		}
+	}
+	for(i = 0; i < variables.size(); i++){
+		if( results[4] == variables.at(i).getName()){
+			check3 = true;
+			*input2 = i;
+			break;
+		}
+	}
+
+	if( check1 == true && check2 == true && check3 == true ){
+		return true;
+	}
+
+	return false;
+}
+
 
 /*
 Get the delay from the operations as per pdf
@@ -136,18 +224,4 @@ int findDelay(std::string oper) {
 		// error cases are only for missing vars so eh. Just food for thought.
 		return 1;
 	}
-}
-
-
-/*
-Searches for the node inside the unscheduled list
-*/
-bool findNode(std::string name, node* currNode, std::vector<node>* list) {
-	for (unsigned int i = 0; i < list->size(); i++) {
-		if (list->at(i).getName() == name) {
-			*currNode = list->at(i);
-			return true;
-		}
-	}
-	return false;
 }

@@ -1,9 +1,8 @@
 #ifndef FILEIN_H
 #define FILEIN_H
 
-#include "node.h"	// Has <string> and <vector>
-#include "operation.h"
-#include "conditional.h"
+#include "variable.h"	// Has <string> and <vector>
+#include "node.h"
 
 #include <fstream>
 #include <sstream>
@@ -11,10 +10,16 @@
 #include <stdlib.h>
 #include <algorithm>
 
-int fileRead(char* fileName, std::vector<node>* unscheduledIO, 
-	std::vector<operation>* unscheduledOperation, 
-	std::vector<conditional>* unscheduledConditional);
+int fileRead(char* fileName, std::vector<variable>* unscheduledIO, std::vector<node>* unscheduledNodes);
+
+bool checkMux(std::vector<std::string> results, std::vector<variable> variables, int* output, int* input1, int* input2, int* input3);
+
+bool checkOperation(std::vector<std::string> results, std::vector<variable> variables, int* output, int* input1, int* input2);
 
 int findDelay(std::string oper);
-bool findNode(std::string name, node* currNode, std::vector<node>* list);
+
+void newVariableList(int input1, int input2);
+
+void newVariableListMux(int input1, int input2, int input3);
+
 #endif

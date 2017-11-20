@@ -1,6 +1,6 @@
 #include "fileOut.h"
 
-void generateIO(std::vector<node> list, char* outFileStr) {
+void generateIO(std::vector<variable> list, char* outFileStr) {
 	// Variables for string concatenation
 	std::stringstream ss;
 	std::string ioTemp;
@@ -43,7 +43,7 @@ void generateIO(std::vector<node> list, char* outFileStr) {
 	myFile.close();
 }
 
-std::string generateModule(std::string result, std::string oper1, std::string oper2, std::string type, int num, std::vector<node>ioList) {
+std::string generateModule(std::string result, std::string oper1, std::string oper2, std::string type, int num, std::vector<variable>ioList) {
 	//switch statement based off of type
 	//if - or + check if oper2 is 1, then use inc or dec
 	//default case to check for error where it's not a real operator
@@ -157,7 +157,7 @@ std::string generateModule(std::string result, std::string oper1, std::string op
 	else return out;
 }
 
-std::string generateMux(std::string result, std::string oper1, std::string oper2, std::string oper3, int num, std::vector<node>ioList) {
+std::string generateMux(std::string result, std::string oper1, std::string oper2, std::string oper3, int num, std::vector<variable>ioList) {
 	int i = 0;
 	bool real1 = false;
 	bool sign1 = false;
@@ -188,11 +188,11 @@ std::string generateMux(std::string result, std::string oper1, std::string oper2
 	return "MUX2x1 #(.DATAWIDTH(" + toString(datawidth) + ")) mux" + toString(num) + "(" + oper1 + "," + oper2 + "," + oper3 + "," + result + ");";
 }
 //FIXME: alter this to reflect if statements and temp vars(?)
-void generateVerilogFile(std::vector<node> ioList, std::vector<std::string> moduleList, char* inFileStr, char* outFileStr) {
+void generateVerilogFile(std::vector<variable> ioList, std::vector<std::string> moduleList, char* inFileStr, char* outFileStr) {
 
 	std::ofstream outFS; // Open file to append/write to it.
 	std::string moduleName = inFileStr; // Getting the module name
-	std::vector<node> ioHeaderList;	// For having a smaller list of input/output for just the header module(___); part. Needed because main ioList will also include wire/regs
+	std::vector<variable> ioHeaderList;	// For having a smaller list of input/output for just the header module(___); part. Needed because main ioList will also include wire/regs
 
 									// https://stackoverflow.com/questions/8520560/get-a-file-name-from-a-path
 	moduleName = moduleName.substr(moduleName.find_last_of("/\\_") + 1); // finds last occurance of a /, \, or _ (for trimming path)

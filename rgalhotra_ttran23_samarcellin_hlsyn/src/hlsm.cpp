@@ -3,37 +3,69 @@
 /*
 Calculates the dependency and gets cycle times for each operation
 */
-bool scheduleASAP(int latency, std::vector<operation>* unscheduledOperation, std::vector<conditional>* unscheduledConditional, std::vector<std::vector<operation>>* ASAP) {
-	std::vector<operation> unschedASAP = *unscheduledOperation;
-	unsigned int i = 0, j = 0, k = 0, t = 0;
-	bool found = false;
-	(*ASAP).push_back(std::vector<operation>());
-	// Setting initial predecessor nodes sched'd
-	for (i = 0; i < unscheduledOperation->size(); i++) {
-		found = false;
-		for (j = 0; j < unschedASAP.size(); j++) {
-			if ((*unscheduledOperation).at(i).getInput1().getName() == unschedASAP.at(j).getOutput().getName()
-				|| (*unscheduledOperation).at(i).getInput2().getName() == unschedASAP.at(j).getOutput().getName()) {
-				found = true;
-				break;
+bool scheduleASAP(int latency, std::vector<node>* unscheduled, std::vector<std::vector<node>>* ASAP) {
+	int scheduled = 0;
+	int i = 0;
+	int j,k,m;
+	bool unschedPrevNode = false;
+
+	while(scheduled < (*unscheduled).size()){
+		(*ASAP).push_back(std::vector<node>());
+
+		for (j = 0; j < (*unscheduled).size(); ++j) {
+			unschedPrevNode = false;
+			if (i == 0) {
+				//if there are no previous nodes
+				if ((*unscheduled).at(j).getPrevNodes().size() == 0) {
+					(*ASAP).at(i).push_back((*unscheduled).at(j));
+					(*unscheduled).at(j).setAsapTime(i);
+					scheduled++;
+					
+					//Need to account for the delay if there is one
+					//FIXME~!
+					for (k = 0; k < (*unscheduled).at(j).getNextNodes().size(); k++) {
+						if (i + (*unscheduled).at(j).getDelay() > (*unscheduled).at(j)->getNextNodes().at(k)->getCyclesElapsed()) {
+							(*unscheduled).at(j)->getNextNodes().at(k)->setCyclesElapsed(i + (*unscheduled).at(j).getDelay());
+						}
+					}
+				}
+			}
+		else {
+				//schedule node if allowed cycle is equal to i
+				for (m = 0; m < (*unscheduled).at(j)->getPreviousNodes().size(); m++) {
+					if ((*unscheduled).at(j)->getPreviousNodes().at(m)->getAsapTime() == -1) {
+						unschedPrevNode = true;
+					}
+				}
+				if ((*unscheduled).at(j)->getCycleAllowed() == i && !unschedPrevNode) {
+					(*ASAP).at(i).push_back((*unscheduled).at(j));
+					(*unscheduled).at(j)->setAsapTime(i);
+					scheduled++;
+					//update nodes allowed cycle time
+					for (k = 0; k < (*unscheduled).at(j)->getNextNodes().size(); ++k) {
+						if (i + (*unscheduled).at(j)->getDelay() > (*unscheduled).at(j)->getNextNodes().at(k)->getCycleAllowed()) {
+							(*unscheduled).at(j)->getNextNodes().at(k)->setCycleAllowed(i + (*unscheduled).at(j)->getDelay());
+						}
+					}
+					if ((*unscheduled).at(j)->getConditional()) {
+						for (k = 0; k < (int)(*unscheduled).at(j)->getNextIfNodes().size(); ++k) {
+							if (i + (*unscheduled).at(j)->getDelay() > (*unscheduled).at(j)->getNextIfNodes().at(k)->getCycleAllowed()) {
+								(*unscheduled).at(j)->getNextIfNodes().at(k)->setCycleAllowed(i + (*unscheduled).at(j)->getDelay());
+							}
+						}
+						for (k = 0; k < (int)(*unscheduled).at(j)->getNextElseNodes().size(); ++k) {
+							if (i + (*unscheduled).at(j)->getDelay() > (*unscheduled).at(j)->getNextElseNodes().at(k)->getCycleAllowed()) {
+								(*unscheduled).at(j)->getNextElseNodes().at(k)->setCycleAllowed(i + (*unscheduled).at(j)->getDelay());
+							}
+						}
+					}
+				}
 			}
 		}
-		unscheduledOperation->at(i).setSchedState(false);
-		if (!found) {
-			unscheduledOperation->at(i).setSchedState(true);
-			(*ASAP).at(0).push_back((*unscheduledOperation).at(i));
-		}
+		i++;
 	}
 
-	// Starting now from time 2 (in code, it's t=1 since it starts at 0) and onwards.
-	t=1;
-	while (t < unscheduledOperation->size() - ASAP->at(0).size()) {	// Iterate through the rest of operations
-		(*ASAP).push_back(std::vector<operation>());
-		for (i = 0; i < unscheduledOperation->size(); i++) {
 
-		}
-		t++;
-	}
 	// Checking if latency is enough
 	if ((*ASAP).size() > latency) {
 		return false;
@@ -44,6 +76,6 @@ bool scheduleASAP(int latency, std::vector<operation>* unscheduledOperation, std
 /*
 Calculates the dependency and gets cycle times for each operation
 */
-bool scheduleALAP(int latency, std::vector<operation>* unscheduledOperation, std::vector<conditional>* unscheduledConditional, std::vector<std::vector<operation>>* ALAP) {
+bool scheduleALAP(int latency, std::vector<node>* unscheduled, std::vector<std::vector<node>>* ALAP) {
 	return false;
 }
