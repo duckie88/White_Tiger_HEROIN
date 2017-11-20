@@ -20,6 +20,22 @@ std::string node::getOperation(){
 	return this->operation;
 }
 
+std::string node::getVarOne() {
+	return this->varOne;
+}
+
+std::string node::getVarTwo() {
+	return this->varTwo;
+}
+
+void node::setVarOne(std::string one) {
+	this->varOne = one;
+}
+
+void node::setVarTwo(std::string two) {
+	this->varTwo = two;
+}
+
 void node::setOperation(std::string operation){
 	this->operation = operation;
 	return;

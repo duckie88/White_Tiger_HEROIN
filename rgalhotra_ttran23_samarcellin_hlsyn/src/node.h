@@ -11,6 +11,8 @@
 class node {
 private:
 	std::string operation;
+	std::string varOne;
+	std::string varTwo;
 	std::vector<node*> prevNodes;
 	std::vector<node*> nextNodes;
 	std::vector<node*> nextIfNodes;
@@ -32,6 +34,10 @@ public:
 	std::string getOperation();
 	void setOperation(std::string operation);
 	
+	std::string getVarOne();
+	std::string getVarTwo();
+	void setVarOne(std::string one);
+	void setVarTwo(std::string two);
 	
 	std::vector<node*> getPrevNodes();
 	void setPrevNodes(std::vector<node*> previous);

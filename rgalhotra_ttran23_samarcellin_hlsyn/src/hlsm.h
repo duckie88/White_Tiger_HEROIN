@@ -3,7 +3,7 @@
 
 #include "node.h"
 
-bool scheduleASAP(int latency, std::vector<node>* unscheduledOperation, std::vector<std::vector<node>>* ASAP);
+std::vector<std::vector<node>> scheduleASAP(int latency, std::vector<node> unscheduled);
 bool scheduleALAP(int latency, std::vector<node>* unscheduledOperation, std::vector<std::vector<node>>* ALAP);
 
 #endif //HLSM_H
