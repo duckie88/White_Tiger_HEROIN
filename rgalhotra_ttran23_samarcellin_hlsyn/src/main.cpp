@@ -3,16 +3,20 @@
 #include <vector>
 
 #include "node.h"
+#include "hlsm.h"
 #include "fileIn.h"
+#include "fileOut.h"
 #include "operation.h"
 #include "conditional.h"
-
 
 int main(int argc, char* argv[]) {
 	std::vector<node> unscheduledIO;
 	std::vector<operation> unscheduledOperation;
 	std::vector<conditional> unscheduledConditional;
 	
+	std::vector<std::vector<operation>> scheduledASAP;
+	std::vector<std::vector<operation>> scheduledALAP;
+
 	if (argc != 4) {  //check for correct function call
 		std::cout << "\nUSAGE: hlsyn cFile Latency verilogFile\n\n";
 		return EXIT_FAILURE;
@@ -34,7 +38,10 @@ int main(int argc, char* argv[]) {
 		std::cout << unscheduledOperation.at(i).getOutput().getName() << "=" << unscheduledOperation.at(i).getInput1().getName() << unscheduledOperation.at(i).getOperType() << unscheduledOperation.at(i).getInput2().getName() << std::endl;
 	}
 	//make the graph
-
+	if (!scheduleASAP(std::stoi(argv[2]), &unscheduledOperation, &unscheduledConditional, &scheduledASAP)) {
+		std::cout << "ASAP schedule exceeds latency provided. Cannot schedule. Error.\n";
+		return EXIT_FAILURE;
+	}
 	//output verilog
 
 

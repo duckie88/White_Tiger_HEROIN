@@ -13,6 +13,8 @@ private:
 	node variable;	// For mux operations
 	int delay;	// The cycle time required: mul = 2 cycles, div/mod = 3 cycles, add/sub/logic/else = 1 cycle
 	bool cond; // If it's within a conditional
+	bool schedState;
+
 public:
 	// Constructors
 	operation();
@@ -29,6 +31,7 @@ public:
 	node getMuxSel();
 	int getDelay();
 	bool getConditional();
+	bool getSchedState();
 
 	// Setters. Probably won't see use but declared for consistency sake.
 	void setLineNum(int start);
@@ -39,6 +42,7 @@ public:
 	void setMuxSel(node sel);
 	void setDelay(int num);
 	void setConditional(bool cond);
+	void setSchedState(bool s);
 };
 
 #endif //OPERATION_H
