@@ -11,6 +11,7 @@ int main(int argc, char* argv[]) {
 	std::vector<variable> unscheduledIO;
 	std::vector<node> unscheduledNodes;
 	std::vector<std::vector<node>> scheduledASAP, scheduledALAP;
+	
 
 	if (argc != 4) {  //check for correct function call
 		std::cout << "\nUSAGE: hlsyn cFile Latency verilogFile\n\n";
@@ -29,15 +30,23 @@ int main(int argc, char* argv[]) {
 	std::cout << "\n\n\n";
 
 	//make the graph
-	if (!scheduleASAP(std::stoi(argv[2]), &unscheduledNodes, &scheduledASAP)) {
+	if (!scheduleASAP(std::stoi(argv[2]), &unscheduledNodes, &scheduledASAP)) { //do ASAP
 		std::cout << "ASAP schedule exceeds latency provided. Cannot schedule. Error.\n";
 		return EXIT_FAILURE;
 	}
 
-	if (!scheduleALAP(std::stoi(argv[2]), &unscheduledNodes, &scheduledALAP)) {
-		std::cout << "ASAP schedule exceeds latency provided. Cannot schedule. Error.\n";
+	if (!scheduleALAP(std::stoi(argv[2]), &unscheduledNodes, &scheduledALAP)) { //do ALAP
+		std::cout << "ALAP Error.\n";
 		return EXIT_FAILURE;
 	}
+
+	//do FDS   FINALLY
+	if (!FDS(unscheduledNodes.size(), &scheduledASAP,  &scheduledALAP)){
+		std::cout << "FDS Error.\n";
+		return EXIT_FAILURE;
+	}
+
+
 	//output verilog
 
 

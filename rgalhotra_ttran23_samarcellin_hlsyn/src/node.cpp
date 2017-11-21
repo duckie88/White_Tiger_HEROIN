@@ -8,10 +8,10 @@ node::node(){
 node::node(int nodeNum){
 	this->nodeNum = nodeNum;
 	visited = 'w';
-	delay = 0;
+	delay = -1;
 	asapTime = -1;
 	alapTime = -1;
-	cyclesElapsed = 0;
+	cyclesElapsed = -1;
 	scheduled = false;
 	conditional = false;
 }
