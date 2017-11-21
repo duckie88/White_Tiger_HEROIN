@@ -22,7 +22,7 @@ std::vector<std::vector<node>> scheduleASAP(int latency, std::vector<node> unsch
 				}
 				else {
 					for (n = 0; n < unscheduled.at(j + k).getDelay(); n++) { //if delay, add it to a bunch of ASAPs
-						for (z = 0; z < ASAP.at(i).at(z).size(); z++) { //check conflicts again
+						for (z = 0; z < ASAP.at(i).size(); z++) { //check conflicts again
 							if (ASAP.at(i).at(z).getVarOne() == unscheduled.at(j + k).getVarOne() || ASAP.at(i).at(z).getVarTwo() == unscheduled.at(j + k).getVarTwo()) {
 								goto exitcond; //FIGHT ME STEPH
 							}
