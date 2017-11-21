@@ -21,17 +21,16 @@ bool scheduleASAP(int latency, std::vector<node>* unscheduled, std::vector<std::
 					(*ASAP).at(i).push_back((*unscheduled).at(j));
 					(*unscheduled).at(j).setAsapTime(i);
 					scheduled++;
-					
+
 					//deal with the delay (if exists)
-					temp = (*unscheduled).at(j).getNextNodes();
-					for (k = 0; k < temp.size(); k++) {
-						if (i + (*unscheduled).at(j).getDelay() > temp.at(k)->getCyclesElapsed()) {
-							temp.at(k)->setCyclesElapsed(i + (*unscheduled).at(j).getDelay());
+					for (k = 0; k < (*unscheduled).at(j).getNextNodes().size(); k++) {
+						if (i + (*unscheduled).at(j).getDelay() >= (*unscheduled).at(j).getNextNodes().at(k)->getCyclesElapsed()) {
+							(*unscheduled).at(j).getNextNodes().at(k)->setCyclesElapsed(i + (*unscheduled).at(j).getDelay() + 1);
 						}
 					}
 				}
 			}
-		else {
+			else {
 				//schedule node if cycle is i
 				temp = (*unscheduled).at(j).getPrevNodes();
 				for (m = 0; m < temp.size(); m++) {
@@ -44,8 +43,8 @@ bool scheduleASAP(int latency, std::vector<node>* unscheduled, std::vector<std::
 					(*unscheduled).at(j).setAsapTime(i);
 					scheduled++;
 					//update node cycle time
-					for (k = 0; k < (*unscheduled).at(j).getNextNodes().size(); ++k) {
-						if (i + (*unscheduled).at(j).getDelay() > (*unscheduled).at(j).getNextNodes().at(k)->getCyclesElapsed()) {
+					for (k = 1; k < (*unscheduled).at(j).getNextNodes().size(); ++k) {
+						if (i + (*unscheduled).at(j).getDelay() >(*unscheduled).at(j).getNextNodes().at(k)->getCyclesElapsed()) {
 							(*unscheduled).at(j).getNextNodes().at(k)->setCyclesElapsed(i + (*unscheduled).at(j).getDelay());
 						}
 					}
@@ -56,7 +55,7 @@ bool scheduleASAP(int latency, std::vector<node>* unscheduled, std::vector<std::
 								temp.at(k)->setCyclesElapsed(i + (*unscheduled).at(j).getDelay());
 							}
 						}
-						
+
 						temp = (*unscheduled).at(j).getNextElseNodes();
 						for (k = 0; k < temp.size(); ++k) {
 							if (i + (*unscheduled).at(j).getDelay() > temp.at(k)->getCyclesElapsed()) {

@@ -98,27 +98,33 @@ int fileRead(char* fileName, std::vector<variable>* variables, std::vector<node>
 			else if (results[1] == "=") {
 				if(results[3] == "?") {
 					if(checkMux(results, *variables, &output, &input1, &input2, &input3)){
+						(*unscheduledNodes).at(output).setOperation(results[3]);
 						(*unscheduledNodes).at(output).setDelay(findDelay((*variables).at(output).getType())); //set delay
 						(*unscheduledNodes).at(output).addNextNode(&(*unscheduledNodes).at(output)); //set edges
+						(*unscheduledNodes).at(input1).addNextNode(&(*unscheduledNodes).at(output));
+						(*unscheduledNodes).at(input2).addNextNode(&(*unscheduledNodes).at(output));
+						(*unscheduledNodes).at(input3).addNextNode(&(*unscheduledNodes).at(output));
 						(*unscheduledNodes).at(output).addPrevNode(&(*unscheduledNodes).at(input1));
 						(*unscheduledNodes).at(output).addPrevNode(&(*unscheduledNodes).at(input2));
 						(*unscheduledNodes).at(output).addPrevNode(&(*unscheduledNodes).at(input3));
 					}
 					else{
-						EXIT_FAILURE;
+						return EXIT_FAILURE;
 					}
 				}
 				else{
 					if(checkOperation(results, *variables, &output, &input1, &input2)){
+						(*unscheduledNodes).at(output).setOperation(results[3]);
 						(*unscheduledNodes).at(output).setDelay(findDelay((*variables).at(output).getType()));
 						(*unscheduledNodes).at(output).addNextNode(&(*unscheduledNodes).at(output));
+						(*unscheduledNodes).at(input1).addNextNode(&(*unscheduledNodes).at(output));
+						(*unscheduledNodes).at(input2).addNextNode(&(*unscheduledNodes).at(output));
 						(*unscheduledNodes).at(output).addPrevNode(&(*unscheduledNodes).at(input1));
 						(*unscheduledNodes).at(output).addPrevNode(&(*unscheduledNodes).at(input2));
-
 						//std::cout << (*unscheduledNodes).at(output).getOperation() << (*unscheduledNodes).at(output).getNodeNum()  << "\t" << std::endl; //test indexes returned right
 					}
 					else{
-						EXIT_FAILURE;
+						return EXIT_FAILURE;
 					}
 				}
 			}
