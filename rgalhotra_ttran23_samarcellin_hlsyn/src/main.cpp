@@ -30,7 +30,7 @@ int main(int argc, char* argv[]) {
 
 	//make the graph
 	if (scheduleASAP(std::stoi(argv[2]), unscheduledNodes).size() > 0) {
-		std::cout << "ASAP schedule exceeds latency provided. Cannot schedule. Error.\n";
+		std::cout << scheduleASAP(std::stoi(argv[2]), unscheduledNodes).size();
 		return EXIT_FAILURE;
 	}
 
