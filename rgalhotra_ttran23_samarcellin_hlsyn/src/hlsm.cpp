@@ -13,6 +13,7 @@ std::vector<std::vector<node>> scheduleASAP(int latency, std::vector<node> unsch
 	std::vector<std::vector<node>> ASAP; //output thing.
 	ASAP.push_back(std::vector<node>()); //START THIS SHIT
 	for (j = 0; j < unscheduled.size(); j++) { //go down the list of events to add
+		ASAP.push_back(std::vector<node>());
 		ASAP.at(i).push_back(unscheduled.at(j)); //start off by adding the first event
 		unscheduled.at(j).setAsapTime(i); //leftover, will probably remove
 		for (k = 1; k < unscheduled.size() - j; k++) { //check events after current one
