@@ -70,11 +70,11 @@ void node::setNextElseNodes(std::vector<node*> nextElseNodes){
 	return;
 }
 
-char node::getVisted(){
+char node::getVisited(){
 	return this->visited;
 }
 
-void node::setVisted(char visited){
+void node::setVisited(char visited){
 	this->visited = visited;
 	return;
 }

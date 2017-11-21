@@ -43,8 +43,8 @@ public:
 	void setNextElseNodes(std::vector<node*> elseNext);
 	
 	
-	char getVisted();
-	void setVisted(char visited);
+	char getVisited();
+	void setVisited(char visited);
 	
 	
 	int getNodeNum();
