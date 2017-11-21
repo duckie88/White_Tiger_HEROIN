@@ -4,13 +4,13 @@
 Calculates the dependency and gets cycle times for each operation
 */
 bool scheduleASAP(int latency, std::vector<node>* unscheduled, std::vector<std::vector<node>>* ASAP) {
-	int scheduled = 0;
+	unsigned int scheduled = 0;
 	int i = 0;
-	int j,k,m;
+	unsigned int j, k, m;
 	bool unschedPrevNode = false;
 	std::vector<node*> temp;
 
-	while(scheduled < (*unscheduled).size()){
+	while (scheduled < (*unscheduled).size()){
 		(*ASAP).push_back(std::vector<node>());
 
 		for (j = 0; j < (*unscheduled).size(); ++j) {
@@ -71,7 +71,7 @@ bool scheduleASAP(int latency, std::vector<node>* unscheduled, std::vector<std::
 
 
 	// Checking if latency is enough
-	if ((*ASAP).size() > latency) {
+	if ((*ASAP).size() > (unsigned int)latency) {
 		return false;
 	}
 	return true;
@@ -81,5 +81,83 @@ bool scheduleASAP(int latency, std::vector<node>* unscheduled, std::vector<std::
 Calculates the dependency and gets cycle times for each operation
 */
 bool scheduleALAP(int latency, std::vector<node>* unscheduled, std::vector<std::vector<node>>* ALAP) {
-	return false;
+	
+	int i;
+	unsigned int j, k, m;
+	
+	for (i = 0; i < (*unscheduled).size(); ++i) {
+		(*unscheduled).at(i).setCyclesElapsed(latency - 1);
+		//Don't want to schedule the inputs, reset scheduled to true
+		if ((*unscheduled).at(i).getPrevNodes().size() == 0) {	
+			(*unscheduled).at(i).setScheduled(true);
+		} //Else, all others are operations, thus nor scheduled
+		else {
+			(*unscheduled).at(i).setScheduled(false);
+		}
+	}
+
+	//adding empty vectors to the times
+	for (i = 0; i < latency; ++i) {
+		(*ALAP).push_back(std::vector<node>());
+	}
+
+	for (i = latency - 1; i >= 0; --i) {
+		for (j = 0; j < (*unscheduled).size(); ++j) {
+			if (i == latency - 1) {
+				if ((*unscheduled).at(j).getNextNodes().size() == 1 && (*unscheduled).at(j).getNextIfNodes().size() == 0 && !(*unscheduled).at(j).getScheduled()) {
+					if ((*unscheduled).at(j).getDelay() > 1) {
+						(*ALAP).at(i - (*unscheduled).at(j).getDelay() + 1).push_back((*unscheduled).at(j));
+						(*unscheduled).at(j).setAlapTime(i - (*unscheduled).at(j).getDelay() + 1);
+						(*unscheduled).at(j).setScheduled(true);
+						for (k = 0; k < (*unscheduled).at(j).getPrevNodes().size(); ++k) {
+							if (i - (*unscheduled).at(j).getDelay() + 1 < (*unscheduled).at(j).getPrevNodes().at(k)->getCyclesElapsed()) {
+								(*unscheduled).at(j).getPrevNodes().at(k)->setCyclesElapsed(i - (*unscheduled).at(j).getDelay() + 1);
+							}
+						}
+					}
+					else {
+						(*ALAP).at(i).push_back((*unscheduled).at(j));
+						(*unscheduled).at(j).setAlapTime(i);
+						(*unscheduled).at(j).setScheduled(true);
+						for (k = 0; k < (*unscheduled).at(j).getPrevNodes().size(); ++k) {
+							if (i - (*unscheduled).at(j).getDelay() < (*unscheduled).at(j).getPrevNodes().at(k)->getCyclesElapsed()) {
+								(*unscheduled).at(j).getPrevNodes().at(k)->setCyclesElapsed(i - (*unscheduled).at(j).getDelay());
+							}
+						}
+					}
+				}
+			}
+			else {
+				if ((*unscheduled).at(j).getCyclesElapsed() == i && !(*unscheduled).at(j).getScheduled()) {
+					if ((*unscheduled).at(j).getDelay() > 1) {
+						(*ALAP)[i - (*unscheduled).at(j).getDelay()].push_back((*unscheduled).at(j));
+						(*unscheduled).at(j).setAlapTime(i - (*unscheduled).at(j).getDelay());
+						(*unscheduled).at(j).setScheduled(true);
+						for (k = 0; k < (*unscheduled).at(j).getPrevNodes().size(); ++k) {
+							if (i - (*unscheduled).at(j).getDelay() - 1 < (*unscheduled).at(j).getPrevNodes().at(k)->getCyclesElapsed()) {
+								(*unscheduled).at(j).getPrevNodes().at(k)->setCyclesElapsed(i - (*unscheduled).at(j).getDelay());
+							}
+						}
+					}
+					else {
+						(*ALAP).at(i).push_back((*unscheduled).at(j));
+						(*unscheduled).at(j).setAlapTime(i);
+						(*unscheduled).at(j).setScheduled(true);
+						for (k = 0; k < (*unscheduled).at(j).getPrevNodes().size(); ++k) {
+							if (i - (*unscheduled).at(j).getDelay() < (*unscheduled).at(j).getPrevNodes().at(k)->getCyclesElapsed()) {
+								(*unscheduled).at(j).getPrevNodes().at(k)->setCyclesElapsed(i - (*unscheduled).at(j).getDelay());
+							}
+						}
+					}
+
+				}
+			}
+		}
+	}
+	for (i = 0; i < (*unscheduled).size(); ++i) {
+		if ((*unscheduled).at(i).getCyclesElapsed() < 0) {
+			return false;
+		}
+	}
+	return true;
 }

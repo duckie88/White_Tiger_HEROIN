@@ -10,7 +10,7 @@
 int main(int argc, char* argv[]) {
 	std::vector<variable> unscheduledIO;
 	std::vector<node> unscheduledNodes;
-	std::vector<std::vector<node>> scheduledASAP;
+	std::vector<std::vector<node>> scheduledASAP, scheduledALAP;
 
 	if (argc != 4) {  //check for correct function call
 		std::cout << "\nUSAGE: hlsyn cFile Latency verilogFile\n\n";
@@ -34,9 +34,13 @@ int main(int argc, char* argv[]) {
 		return EXIT_FAILURE;
 	}
 
-
+	if (!scheduleALAP(std::stoi(argv[2]), &unscheduledNodes, &scheduledALAP)) {
+		std::cout << "ASAP schedule exceeds latency provided. Cannot schedule. Error.\n";
+		return EXIT_FAILURE;
+	}
 	//output verilog
 
 
 	return EXIT_SUCCESS;
 }
+
