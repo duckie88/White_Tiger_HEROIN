@@ -8,6 +8,8 @@ std::vector<std::vector<node>> scheduleASAP(int latency, std::vector<node> unsch
 	int j = 0;
 	int k = 0;
 	int m = 0;
+	int n = 0;
+	int z = 0;
 	std::vector<std::vector<node>> ASAP;
 	ASAP.push_back(std::vector<node>());
 	for (j = 0; j < unscheduled.size(); j++) {
@@ -19,7 +21,14 @@ std::vector<std::vector<node>> scheduleASAP(int latency, std::vector<node> unsch
 					goto exitcond; //FIGHT ME STEPH
 				}
 				else {
-					ASAP.at(i).push_back(unscheduled.at(j + k));
+					for (n = 0; n < unscheduled.at(j + k).getDelay(); n++) {
+						for (z = 0; z < ASAP.at(i).at(z).size(); z++) {
+							if (ASAP.at(i).at(z).getVarOne() == unscheduled.at(j + k).getVarOne() || ASAP.at(i).at(z).getVarTwo() == unscheduled.at(j + k).getVarTwo()) {
+								goto exitcond; //FIGHT ME STEPH
+							}
+						}
+						ASAP.at(i + n).push_back(unscheduled.at(j + k));
+					}
 				}
 			}
 		}
