@@ -47,8 +47,11 @@ int main(int argc, char* argv[]) {
 	}
 
 
-	//output verilog
-
+	//output verilog #need to know how we're handling FDS output
+	/*if (!generateVerilogFile()) {
+		std::cout << "Output Error.\n";
+		return EXIT_FAILURE;
+	}*/
 
 	return EXIT_SUCCESS;
 }
