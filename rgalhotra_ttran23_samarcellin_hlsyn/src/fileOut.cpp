@@ -209,15 +209,6 @@ bool generateVerilogFile(std::vector<variable> ioList, std::vector<state> states
 
 	// Header
 	outFS << "`timescale 1ns / 1ps" << std::endl;
-	outFS << "//////////////////////////////////////////////////////////////////////////////////" << std::endl;
-	outFS << "//" << std::endl;
-	outFS << "//Students: Tam \"I cost my group 30 points last time\" Tran (Undergrad), Rohin Galhotra (Grad), Stephanie Marcellin (Grad)" << std::endl;
-	outFS << "//Assignment: " << "3" << std::endl;
-	outFS << "//Description: An HLSM module which represents the C-like behavioral description " << std::endl;
-	outFS << "//             into a scheduled high-level statement machine implemented in Verilog." << std::endl;
-	outFS << "//" << std::endl;
-	outFS << "//////////////////////////////////////////////////////////////////////////////////" << std::endl;
-	outFS << std::endl;
 	outFS << "module HLSM"  << "(Clk, Rst, Start, Done, ";
 	//std::cout << "module " << moduleName << "( ";
 
@@ -243,59 +234,57 @@ bool generateVerilogFile(std::vector<variable> ioList, std::vector<state> states
 	generateIO(ioList, outFileStr);
 
 	// Generates the list of operations
-	outFS << "\t" << "reg[";
+	outFS << "reg[";
 	outFS << ceil(log(states.size() + 2)/log(2));
 	outFS << ":0] state;" << std::endl;
 
-	/* Print the parameters */
-	outFS << "\t" << "parameter sWait = 0,";
-
-	/* Print out all parameters (nodes, really) */
+	// Generates the list of parameters
+	outFS << "parameter sWait = 0,";
 	for (i = 0; i < states.size(); i++) {
 		outFS << " s" << i + 2 << " = " << i + 1 << ",";
 	}
 	outFS << " sFinal = " << i + 1 << ";" << std::endl << std::endl;
 
-	/* Create the case statements. */
-	outFS << "\t" << "always@(posedge Clk) begin" << std::endl;
+	// Create the case statements.
+	outFS << "always@(posedge Clk) begin" << std::endl;
 
-	/* Reset condition. */
-	outFS << "\t\t" << "if(Rst == 1) begin" << std::endl;
-	outFS << "\t\t\t" << "state <= sWait;" << std::endl;
+	// Reset state.
+	outFS << "if(Rst == 1) begin" << std::endl;
+	outFS << "state <= sWait;" << std::endl;
 	for (i = 0; i < ioList.size(); i++) {
-		outFS << "\t\t\t" << ioList.at(i).getName() << " <= 0;" << std::endl;
+		outFS << ioList.at(i).getName() << " <= 0;" << std::endl;
 	}
-	for (i = 0; i < (int)ioList.size(); i++) {
+	for (i = 0; i < ioList.size(); i++) {
 		if(ioList.at(i).getType() == "output")
-			outFS << "\t\t\t" << ioList.at(i).getName() << " <= 0;" << std::endl;
+			outFS << ioList.at(i).getName() << " <= 0;" << std::endl;
 	}
-	outFS << "\t\t\t" << "Done <= 0;" << std::endl;
-	outFS << "\t\t" << "end" << std::endl;
+	outFS << "Done <= 0;" << std::endl;
+	outFS << "end" << std::endl;
 
-	/* HLSM Now! Go! */
-	outFS << "\t\t" << "else begin" << std::endl;
-	outFS << "\t\t\t" << "case(state)" << std::endl;
+	//HLSM
+	outFS << "else begin" << std::endl;
+	outFS << "case(state)" << std::endl;
 
-	/* sWait State. */
-	outFS << "\t\t\t\t" << "sWait: begin" << std::endl;
-	outFS << "\t\t\t\t\t" << "Done <= 0;" << std::endl;
-	outFS << "\t\t\t\t\t" << "if (Start == 1)" << std::endl;
-	outFS << "\t\t\t\t\t\t" << "state <= s2;" << std::endl;
-	outFS << "\t\t\t\t\t" << "else" << std::endl;
-	outFS << "\t\t\t\t\t\t" << "state <= sWait;" << std::endl;
-	outFS << "\t\t\t\t" << "end" << std::endl;
+	// sWait State.
+	outFS << "sWait: begin" << std::endl;
+	outFS << "Done <= 0;" << std::endl;
+	outFS << "if (Start == 1)" << std::endl;
+	outFS << "state <= s2;" << std::endl;
+	outFS << "else" << std::endl;
+	outFS << "state <= sWait;" << std::endl;
+	outFS << "end" << std::endl;
 
-	/* The actual states. */
+	// Generate list of states
 	generateStates(states, outFileStr, ioList);
 
-	/* Final State. */
-	outFS << "\t\t\t\t" << "sFinal: begin" << std::endl;
-	outFS << "\t\t\t\t\t" << "Done <= 1;" << std::endl;
-	outFS << "\t\t\t\t\t" << "state <= sWait;" << std::endl;
-	outFS << "\t\t\t\t" << "end" << std::endl;
-	outFS << "\t\t\t" << "endcase" << std::endl;
-	outFS << "\t\t" << "end" << std::endl;
-	outFS << "\t" << "end" << std::endl;
+	//last state
+	outFS << "sFinal: begin" << std::endl;
+	outFS << "Done <= 1;" << std::endl;
+	outFS << "state <= sWait;" << std::endl;
+	outFS << "end" << std::endl;
+	outFS << "endcase" << std::endl;
+	outFS << "end" << std::endl;
+	outFS << "end" << std::endl;
 
 
 	// Footer
@@ -315,7 +304,7 @@ void generateStates(std::vector<state> states, char* outFileStr, std::vector<var
 		exit(EXIT_FAILURE);
 	}
 	for (i = 0; i < states.size(); i++) {
-		outFS << "\t\t\t\t" << "s";
+		outFS << "s";
 		outFS << (i + 2);
 		outFS << ": begin" << std::endl;
 		for (j = 0; j < states.at(i).getNodes().size(); j++) {
@@ -323,7 +312,7 @@ void generateStates(std::vector<state> states, char* outFileStr, std::vector<var
 				outFS << generateMux(states.at(i).getNodes().at(j).getResult(), states.at(i).getNodes().at(j).getVar1(), states.at(i).getNodes().at(j).getVar2(), states.at(i).getNodes().at(j).getVar3(), (i + j), ioList) << std::endl;
 			else
 				outFS << generateModule(states.at(i).getNodes().at(j).getResult(), states.at(i).getNodes().at(j).getVar1(), states.at(i).getNodes().at(j).getVar2(), states.at(i).getNodes().at(j).getOperation(), (i + j), ioList) << std::endl;
-			outFS << "\t\t\t\t\t" << "state <= ";
+			outFS << "state <= ";
 			if (i < states.size() - 1) {
 				outFS << "s" << (i + 3) << ";" << std::endl;
 			}
@@ -331,7 +320,7 @@ void generateStates(std::vector<state> states, char* outFileStr, std::vector<var
 
 				outFS << "sFinal;" << std::endl;
 			}
-			outFS << "\t\t\t\t" << "end" << std::endl;
+			outFS << "end" << std::endl;
 		}
 	}
 }

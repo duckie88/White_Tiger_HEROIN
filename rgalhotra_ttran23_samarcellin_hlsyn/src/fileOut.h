@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 #include <cstdlib>
+#include <cmath>
 #include "variable.h"
 #include "state.h"
 
