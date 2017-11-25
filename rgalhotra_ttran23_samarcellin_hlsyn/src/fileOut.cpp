@@ -290,7 +290,7 @@ bool generateVerilogFile(std::vector<variable> ioList, std::vector<std::string> 
 	outFS << "\t\t\t\t" << "end" << std::endl;
 
 	/* The actual states. */
-	generateStates(_states, outFileStr);
+	generateStates(_states, outFileStr, ioList);
 
 	/* Final State. */
 	outFS << "\t\t\t\t" << "sFinal: begin" << std::endl;
@@ -309,8 +309,35 @@ bool generateVerilogFile(std::vector<variable> ioList, std::vector<std::string> 
 	return true;
 }
 
-void generateStates(std::vector<node> _states, char* outFileStr) {
-	//todo
+void generateStates(std::vector<state> _states, char* outFileStr, std::vector<variable> ioList) {
+	int i = 0;
+	int j = 0;
+	std::ofstream outFS;
+	outFS.open(outFileStr);//open output file
+	if (!outFS.is_open()) { //check opened correctly
+		std::cout << "Could not open output file." << std::endl;
+		exit(EXIT_FAILURE);
+	}
+	for (i = 0; i < (int)_states.size(); i++) {
+		outFS << "\t\t\t\t" << "s";
+		outFS << (i + 2);
+		outFS << ": begin" << std::endl;
+		for (j = 0; j < (int)_states.at(i).getAssignedNodes().size(); j++) {
+			if (_states.at(i).getAssignedNodes().at(j).getOperation() == "mux")
+				outFS << generateMux(_states.at(i).getAssignedNodes().at(j).getResult(), _states.at(i).getAssignedNodes().at(j).getOper1(), _states.at(i).getAssignedNodes().at(j).getOper2(), _states.at(i).getAssignedNodes().at(j).getOper3(), (i + j), ioList) << std::endl;
+			else
+				outFS << generateModule(_states.at(i).getAssignedNodes().at(j).getResult(), _states.at(i).getAssignedNodes().at(j).getOper1(), _states.at(i).getAssignedNodes().at(j).getOper2(), _states.at(i).getAssignedNodes().at(j).getOperation(), (i + j), ioList) << std::endl;
+			outFS << "\t\t\t\t\t" << "state <= ";
+			if (i < (int)_states.size() - 1) {
+				outFS << "s" << (i + 3) << ";" << std::endl;
+			}
+			else {
+
+				outFS << "sFinal;" << std::endl;
+			}
+			outFS << "\t\t\t\t" << "end" << std::endl;
+		}
+	}
 }
 
 std::string toString(int n) {

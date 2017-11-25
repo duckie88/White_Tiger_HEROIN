@@ -11,7 +11,7 @@
 #include "state.h"
 
 // Call it as: generateVerilogFile(argv[2]);
-bool generateVerilogFile(std::vector<variable> ioList, std::vector<std::string> moduleList, std::vector<node> _states, char* filename, char* outFileStr);
+bool generateVerilogFile(std::vector<variable> ioList, std::vector<std::string> moduleList, std::vector<state> _states, char* filename, char* outFileStr);
 void generateIO(std::vector<variable> list, char* outFileStr);
 std::string generateModule(std::string result, std::string oper1, std::string oper2, std::string type, int num, std::vector<variable>ioList);
 std::string generateMux(std::string result, std::string oper1, std::string oper2, std::string oper3, int num, std::vector<variable>ioList);

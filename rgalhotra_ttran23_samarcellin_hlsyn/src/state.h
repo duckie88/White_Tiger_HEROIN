@@ -12,11 +12,11 @@ class state;
 
 class state {
 private:
-	std::vector<node*> _assignedNodes;
+	std::vector<node> _assignedNodes;
 
 public:
 	state();
-	void addAssignedNode(node* addNode);
-	std::vector<node*> getAssignedNodes();
+	void addAssignedNode(node addNode);
+	std::vector<node> getAssignedNodes();
 };
 #endif // STATE_H
