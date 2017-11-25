@@ -187,12 +187,13 @@ std::string generateMux(std::string result, std::string oper1, std::string oper2
 
 	return "MUX2x1 #(.DATAWIDTH(" + toString(datawidth) + ")) mux" + toString(num) + "(" + oper1 + "," + oper2 + "," + oper3 + "," + result + ");";
 }
-//FIXME: alter this to reflect if statements and temp vars(?)
-void generateVerilogFile(std::vector<variable> ioList, std::vector<std::string> moduleList, char* inFileStr, char* outFileStr) {
+
+bool generateVerilogFile(std::vector<variable> ioList, std::vector<std::string> moduleList, std::vector<node> _states, char* filename, char* outFileStr) {
 
 	std::ofstream outFS; // Open file to append/write to it.
-	std::string moduleName = inFileStr; // Getting the module name
+	std::string moduleName = filename;
 	std::vector<variable> ioHeaderList;	// For having a smaller list of input/output for just the header module(___); part. Needed because main ioList will also include wire/regs
+	int i = 0;
 
 									// https://stackoverflow.com/questions/8520560/get-a-file-name-from-a-path
 	moduleName = moduleName.substr(moduleName.find_last_of("/\\_") + 1); // finds last occurance of a /, \, or _ (for trimming path)
@@ -205,7 +206,18 @@ void generateVerilogFile(std::vector<variable> ioList, std::vector<std::string> 
 	}
 
 	// Header
-	outFS << "module " << moduleName << "( ";
+	outFS << "`timescale 1ns / 1ps" << std::endl;
+	outFS << "//////////////////////////////////////////////////////////////////////////////////" << std::endl;
+	outFS << "//" << std::endl;
+	outFS << "//Students: Tam \"I cost my group 30 points last time\" Tran (Undergrad), Rohin Galhotra (Grad), Stephanie Marcellin (Grad)" << std::endl;
+	outFS << "//Assignment: " << "3" << std::endl;
+	outFS << "//File: " << moduleName << ".v" << std::endl;
+	outFS << "//Description: An HLSM module which represents the C-like behavioral description " << std::endl;
+	outFS << "//             into a scheduled high-level statement machine implemented in Verilog." << std::endl;
+	outFS << "//" << std::endl;
+	outFS << "//////////////////////////////////////////////////////////////////////////////////" << std::endl;
+	outFS << std::endl;
+	outFS << "module HLSM"  << "(Clk, Rst, Start, Done, ";
 	//std::cout << "module " << moduleName << "( ";
 
 	// Putting all input/output variables into a secondary vector
@@ -230,16 +242,75 @@ void generateVerilogFile(std::vector<variable> ioList, std::vector<std::string> 
 	generateIO(ioList, outFileStr);
 
 	// Generates the list of operations
-	outFS.open(outFileStr, std::ios::app);
-	for (int i = 0; i < moduleList.size(); i++) {
-		outFS << moduleList.at(i) << std::endl;
-		//std::cout << moduleList.at(i) << std::endl;
+	outFS << "\t" << "reg[";
+	outFS << ceil(log2(_states.size() + 2));
+	outFS << ":0] state;" << std::endl;
+
+	/* Print the parameters */
+	outFS << "\t" << "parameter ";
+	outFS << "sWait = 0,";
+
+	/* Print out all parameters (nodes, really) */
+	for (i = 0; i < (int)_states.size(); i++) {
+		outFS << " s" << i + 2 << " = " << i + 1 << ",";
 	}
+	outFS << " sFinal = " << i + 1 << ";" << std::endl << std::endl;
+
+	/* Create the case statements. */
+	outFS << "\t" << "always@(";
+	outFS << "posedge Clk)";
+	outFS << " begin" << std::endl;
+
+	/* Reset condition. */
+	outFS << "\t\t" << "if(Rst == 1) begin" << std::endl;
+	outFS << "\t\t\t" << "state <= sWait;" << std::endl;
+	for (i = 0; i < (int)ioList.size(); i++) {
+		outFS << "\t\t\t";
+		outFS << ioList.at(i).getName();
+		outFS << " <= 0;" << std::endl;
+	}
+	for (i = 0; i < (int)ioList.size(); i++) {
+		if(ioList.at(i).getType == "output")
+			outFS << "\t\t\t" << ioList.at(i).getName() << " <= 0;" << std::endl;
+	}
+	outFS << "\t\t\t" << "Done <= 0;" << std::endl;
+	outFS << "\t\t" << "end" << std::endl;
+
+	/* HLSM Now! Go! */
+	outFS << "\t\t" << "else begin" << std::endl;
+	outFS << "\t\t\t" << "case(state)" << std::endl;
+
+	/* sWait State. */
+	outFS << "\t\t\t\t" << "sWait: begin" << std::endl;
+	outFS << "\t\t\t\t\t" << "Done <= 0;" << std::endl;
+	outFS << "\t\t\t\t\t" << "if (Start == 1)" << std::endl;
+	outFS << "\t\t\t\t\t\t" << "state <= s2;" << std::endl;
+	outFS << "\t\t\t\t\t" << "else" << std::endl;
+	outFS << "\t\t\t\t\t\t" << "state <= sWait;" << std::endl;
+	outFS << "\t\t\t\t" << "end" << std::endl;
+
+	/* The actual states. */
+	generateStates(_states, outFileStr);
+
+	/* Final State. */
+	outFS << "\t\t\t\t" << "sFinal: begin" << std::endl;
+	outFS << "\t\t\t\t\t" << "Done <= 1;" << std::endl;
+	outFS << "\t\t\t\t\t" << "state <= sWait;" << std::endl;
+	outFS << "\t\t\t\t" << "end" << std::endl;
+	outFS << "\t\t\t" << "endcase" << std::endl;
+	outFS << "\t\t" << "end" << std::endl;
+	outFS << "\t" << "end" << std::endl;
+
 
 	// Footer
 	outFS << std::endl << "endmodule" << std::endl;
 	//std::cout << std::endl << "endmodule" << std::endl;
 	outFS.close();
+	return true;
+}
+
+void generateStates(std::vector<node> _states, char* outFileStr) {
+	//todo
 }
 
 std::string toString(int n) {
