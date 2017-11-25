@@ -3,7 +3,6 @@
 
 #include<string>
 #include<vector>
-#include<cstring>
 #include<algorithm>
 
 #include "node.h"
@@ -12,11 +11,11 @@ class state;
 
 class state {
 private:
-	std::vector<node> _assignedNodes;
+	std::vector<node> nodes;
 
 public:
 	state();
-	void addAssignedNode(node addNode);
-	std::vector<node> getAssignedNodes();
+	void addNode(node addNode);
+	std::vector<node> getNodes();
 };
 #endif // STATE_H

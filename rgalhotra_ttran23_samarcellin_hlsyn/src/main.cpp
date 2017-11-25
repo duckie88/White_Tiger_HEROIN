@@ -10,6 +10,7 @@
 int main(int argc, char* argv[]) {
 	std::vector<variable> unscheduledIO;
 	std::vector<node> unscheduledNodes;
+	std::vector<state> states;
 	std::vector<std::vector<node>> scheduledASAP, scheduledALAP;
 	
 
@@ -22,12 +23,6 @@ int main(int argc, char* argv[]) {
 		std::cout << "\nError reading from cFile\n\n";
 		return EXIT_FAILURE;
 	}
-
-	//test print of results
-	for (unsigned int i = 0; i < unscheduledNodes.size(); i++) {
-		std::cout << unscheduledNodes.at(i).getNodeNum() << "\t" << unscheduledNodes.at(i).getOperation() << std::endl;
-	}
-	std::cout << "\n\n\n";
 
 	//make the graph
 	if (!scheduleASAP(std::stoi(argv[2]), &unscheduledNodes, &scheduledASAP)) { //do ASAP
@@ -46,12 +41,19 @@ int main(int argc, char* argv[]) {
 		return EXIT_FAILURE;
 	}
 
+	//test print of results
+	//for (unsigned int i = 0; i < unscheduledNodes.size(); i++) {
+	//	std::cout << unscheduledNodes.at(i).getNodeNum() << "\t" << unscheduledNodes.at(i).getOperation() << std::endl;
+	//}
+	//std::cout << "\n\n\n";
+
+
 
 	//output verilog #need to know how we're handling FDS output
-	/*if (!generateVerilogFile()) {
+	if (!generateVerilogFile(unscheduledIO, states, argv[3])) {
 		std::cout << "Output Error.\n";
 		return EXIT_FAILURE;
-	}*/
+	}
 
 	return EXIT_SUCCESS;
 }

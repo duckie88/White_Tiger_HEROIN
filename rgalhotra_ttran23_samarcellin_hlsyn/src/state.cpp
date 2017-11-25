@@ -4,10 +4,10 @@ state::state() {
 	//constructor
 }
 
-void state::addAssignedNode(node addNode) {
-	_assignedNodes.push_back(addNode);
+void state::addNode(node addNode) {
+	this->nodes.push_back(addNode);
 }
 
-std::vector<node> state::getAssignedNodes() {
-	return _assignedNodes;
+std::vector<node> state::getNodes() {
+	return this->nodes;
 }

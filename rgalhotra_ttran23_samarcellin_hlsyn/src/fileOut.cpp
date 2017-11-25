@@ -188,16 +188,18 @@ std::string generateMux(std::string result, std::string oper1, std::string oper2
 	return "MUX2x1 #(.DATAWIDTH(" + toString(datawidth) + ")) mux" + toString(num) + "(" + oper1 + "," + oper2 + "," + oper3 + "," + result + ");";
 }
 
-bool generateVerilogFile(std::vector<variable> ioList, std::vector<std::string> moduleList, std::vector<state> _states, char* filename, char* outFileStr) {
+bool generateVerilogFile(std::vector<variable> ioList, std::vector<state> states, char* outFileStr) {
 
 	std::ofstream outFS; // Open file to append/write to it.
-	std::string moduleName = filename;
+	//std::string moduleName = filename;
 	std::vector<variable> ioHeaderList;	// For having a smaller list of input/output for just the header module(___); part. Needed because main ioList will also include wire/regs
 	int i = 0;
 
-									// https://stackoverflow.com/questions/8520560/get-a-file-name-from-a-path
-	moduleName = moduleName.substr(moduleName.find_last_of("/\\_") + 1); // finds last occurance of a /, \, or _ (for trimming path)
-	moduleName = moduleName.substr(0, moduleName.find_last_of(".")); // takes substring up to last occurance of . (for trimming extensions)
+	//								// https://stackoverflow.com/questions/8520560/get-a-file-name-from-a-path
+	//moduleName = moduleName.substr(moduleName.find_last_of("/\\_") + 1); // finds last occurance of a /, \, or _ (for trimming path)
+	//moduleName = moduleName.substr(0, moduleName.find_last_of(".")); // takes substring up to last occurance of . (for trimming extensions)
+	//we don't need this this time since the module is always HLSM guys
+
 
 	outFS.open(outFileStr);//open output file
 	if (!outFS.is_open()) { //check opened correctly
@@ -211,7 +213,6 @@ bool generateVerilogFile(std::vector<variable> ioList, std::vector<std::string> 
 	outFS << "//" << std::endl;
 	outFS << "//Students: Tam \"I cost my group 30 points last time\" Tran (Undergrad), Rohin Galhotra (Grad), Stephanie Marcellin (Grad)" << std::endl;
 	outFS << "//Assignment: " << "3" << std::endl;
-	outFS << "//File: " << moduleName << ".v" << std::endl;
 	outFS << "//Description: An HLSM module which represents the C-like behavioral description " << std::endl;
 	outFS << "//             into a scheduled high-level statement machine implemented in Verilog." << std::endl;
 	outFS << "//" << std::endl;
@@ -243,34 +244,29 @@ bool generateVerilogFile(std::vector<variable> ioList, std::vector<std::string> 
 
 	// Generates the list of operations
 	outFS << "\t" << "reg[";
-	outFS << ceil(log2(_states.size() + 2));
+	outFS << ceil(log(states.size() + 2)/log(2));
 	outFS << ":0] state;" << std::endl;
 
 	/* Print the parameters */
-	outFS << "\t" << "parameter ";
-	outFS << "sWait = 0,";
+	outFS << "\t" << "parameter sWait = 0,";
 
 	/* Print out all parameters (nodes, really) */
-	for (i = 0; i < (int)_states.size(); i++) {
+	for (i = 0; i < states.size(); i++) {
 		outFS << " s" << i + 2 << " = " << i + 1 << ",";
 	}
 	outFS << " sFinal = " << i + 1 << ";" << std::endl << std::endl;
 
 	/* Create the case statements. */
-	outFS << "\t" << "always@(";
-	outFS << "posedge Clk)";
-	outFS << " begin" << std::endl;
+	outFS << "\t" << "always@(posedge Clk) begin" << std::endl;
 
 	/* Reset condition. */
 	outFS << "\t\t" << "if(Rst == 1) begin" << std::endl;
 	outFS << "\t\t\t" << "state <= sWait;" << std::endl;
-	for (i = 0; i < (int)ioList.size(); i++) {
-		outFS << "\t\t\t";
-		outFS << ioList.at(i).getName();
-		outFS << " <= 0;" << std::endl;
+	for (i = 0; i < ioList.size(); i++) {
+		outFS << "\t\t\t" << ioList.at(i).getName() << " <= 0;" << std::endl;
 	}
 	for (i = 0; i < (int)ioList.size(); i++) {
-		if(ioList.at(i).getType == "output")
+		if(ioList.at(i).getType() == "output")
 			outFS << "\t\t\t" << ioList.at(i).getName() << " <= 0;" << std::endl;
 	}
 	outFS << "\t\t\t" << "Done <= 0;" << std::endl;
@@ -290,7 +286,7 @@ bool generateVerilogFile(std::vector<variable> ioList, std::vector<std::string> 
 	outFS << "\t\t\t\t" << "end" << std::endl;
 
 	/* The actual states. */
-	generateStates(_states, outFileStr, ioList);
+	generateStates(states, outFileStr, ioList);
 
 	/* Final State. */
 	outFS << "\t\t\t\t" << "sFinal: begin" << std::endl;
@@ -309,7 +305,7 @@ bool generateVerilogFile(std::vector<variable> ioList, std::vector<std::string> 
 	return true;
 }
 
-void generateStates(std::vector<state> _states, char* outFileStr, std::vector<variable> ioList) {
+void generateStates(std::vector<state> states, char* outFileStr, std::vector<variable> ioList) {
 	int i = 0;
 	int j = 0;
 	std::ofstream outFS;
@@ -318,17 +314,17 @@ void generateStates(std::vector<state> _states, char* outFileStr, std::vector<va
 		std::cout << "Could not open output file." << std::endl;
 		exit(EXIT_FAILURE);
 	}
-	for (i = 0; i < (int)_states.size(); i++) {
+	for (i = 0; i < states.size(); i++) {
 		outFS << "\t\t\t\t" << "s";
 		outFS << (i + 2);
 		outFS << ": begin" << std::endl;
-		for (j = 0; j < (int)_states.at(i).getAssignedNodes().size(); j++) {
-			if (_states.at(i).getAssignedNodes().at(j).getOperation() == "mux")
-				outFS << generateMux(_states.at(i).getAssignedNodes().at(j).getResult(), _states.at(i).getAssignedNodes().at(j).getOper1(), _states.at(i).getAssignedNodes().at(j).getOper2(), _states.at(i).getAssignedNodes().at(j).getOper3(), (i + j), ioList) << std::endl;
+		for (j = 0; j < states.at(i).getNodes().size(); j++) {
+			if (states.at(i).getNodes().at(j).getOperation() == "?")
+				outFS << generateMux(states.at(i).getNodes().at(j).getResult(), states.at(i).getNodes().at(j).getVar1(), states.at(i).getNodes().at(j).getVar2(), states.at(i).getNodes().at(j).getVar3(), (i + j), ioList) << std::endl;
 			else
-				outFS << generateModule(_states.at(i).getAssignedNodes().at(j).getResult(), _states.at(i).getAssignedNodes().at(j).getOper1(), _states.at(i).getAssignedNodes().at(j).getOper2(), _states.at(i).getAssignedNodes().at(j).getOperation(), (i + j), ioList) << std::endl;
+				outFS << generateModule(states.at(i).getNodes().at(j).getResult(), states.at(i).getNodes().at(j).getVar1(), states.at(i).getNodes().at(j).getVar2(), states.at(i).getNodes().at(j).getOperation(), (i + j), ioList) << std::endl;
 			outFS << "\t\t\t\t\t" << "state <= ";
-			if (i < (int)_states.size() - 1) {
+			if (i < states.size() - 1) {
 				outFS << "s" << (i + 3) << ";" << std::endl;
 			}
 			else {

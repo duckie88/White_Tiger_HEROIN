@@ -70,7 +70,7 @@ bool scheduleASAP(int latency, std::vector<node>* unscheduled, std::vector<std::
 
 
 	// Checking if latency is enough
-	if ((*ASAP).size() > (unsigned int)latency) {
+	if ((*ASAP).size() > latency) {
 		return false;
 	}
 	return true;

@@ -25,6 +25,42 @@ void node::setOperation(std::string operation){
 	return;
 }
 
+std::string node::getResult(){
+	return this->result;
+}
+
+void node::setResult(std::string result){
+	this->result = result;
+	return;
+}
+
+std::string  node::getVar1(){
+	return this->var1;
+}
+
+void node::setVar1(std::string var1){
+	this->var1 = var1;
+	return;
+}
+
+std::string  node::getVar2(){
+	return this->var2;
+}
+
+void node::setVar2(std::string var2){
+	this->var2 = var2;
+	return;
+}
+
+std::string  node::getVar3(){
+	return this->var3;
+}
+
+void node::setVar3(std::string var3){
+	this->var3 = var3;
+	return;
+}
+
 int node::getNodeNum(){
 	return nodeNum;
 }

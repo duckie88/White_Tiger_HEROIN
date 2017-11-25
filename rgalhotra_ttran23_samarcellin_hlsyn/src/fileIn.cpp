@@ -97,8 +97,12 @@ int fileRead(char* fileName, std::vector<variable>* variables, std::vector<node>
 			// For everything else
 			else if (results[1] == "=") {
 				if(results[3] == "?") {
-					if(checkMux(results, *variables, &output, &input1, &input2, &input3)){
+					if(checkMux(results, *variables, &output, &input1, &input2, &input3)){ //make sure no errors in input
 						(*unscheduledNodes).at(output).setOperation(results[3]);
+						(*unscheduledNodes).at(output).setResult(results[0]);
+						(*unscheduledNodes).at(output).setVar1(results[2]);
+						(*unscheduledNodes).at(output).setVar2(results[4]);
+						(*unscheduledNodes).at(output).setVar3(results[6]);
 						(*unscheduledNodes).at(output).setDelay(findDelay((*unscheduledNodes).at(output).getOperation())); //set delay
 						(*unscheduledNodes).at(output).addNextNode(&(*unscheduledNodes).at(output)); //set edges
 						(*unscheduledNodes).at(input1).addNextNode(&(*unscheduledNodes).at(output));
@@ -115,6 +119,9 @@ int fileRead(char* fileName, std::vector<variable>* variables, std::vector<node>
 				else{
 					if(checkOperation(results, *variables, &output, &input1, &input2)){
 						(*unscheduledNodes).at(output).setOperation(results[3]);
+						(*unscheduledNodes).at(output).setResult(results[0]);
+						(*unscheduledNodes).at(output).setVar1(results[2]);
+						(*unscheduledNodes).at(output).setVar2(results[4]);
 						(*unscheduledNodes).at(output).setDelay(findDelay((*unscheduledNodes).at(output).getOperation()));
 						(*unscheduledNodes).at(output).addNextNode(&(*unscheduledNodes).at(output));
 						(*unscheduledNodes).at(input1).addNextNode(&(*unscheduledNodes).at(output));
