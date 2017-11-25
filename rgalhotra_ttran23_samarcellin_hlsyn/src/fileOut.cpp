@@ -188,7 +188,7 @@ std::string generateMux(std::string result, std::string oper1, std::string oper2
 	return "MUX2x1 #(.DATAWIDTH(" + toString(datawidth) + ")) mux" + toString(num) + "(" + oper1 + "," + oper2 + "," + oper3 + "," + result + ");";
 }
 
-bool generateVerilogFile(std::vector<variable> ioList, std::vector<std::string> moduleList, std::vector<node> _states, char* filename, char* outFileStr) {
+bool generateVerilogFile(std::vector<variable> ioList, std::vector<std::string> moduleList, std::vector<state> _states, char* filename, char* outFileStr) {
 
 	std::ofstream outFS; // Open file to append/write to it.
 	std::string moduleName = filename;

@@ -8,7 +8,7 @@
 #include <vector>
 #include <cstdlib>
 #include "variable.h"
-#include "node.h"
+#include "state.h"
 
 // Call it as: generateVerilogFile(argv[2]);
 bool generateVerilogFile(std::vector<variable> ioList, std::vector<std::string> moduleList, std::vector<node> _states, char* filename, char* outFileStr);
@@ -17,5 +17,5 @@ std::string generateModule(std::string result, std::string oper1, std::string op
 std::string generateMux(std::string result, std::string oper1, std::string oper2, std::string oper3, int num, std::vector<variable>ioList);
 std::string toString(int n);
 std::string toString(double n);
-void generateStates(std::vector<node> _states, char* outFileStr);
+void generateStates(std::vector<state> _states, char* outFileStr);
 #endif // VERILOGOUTPUT_H
