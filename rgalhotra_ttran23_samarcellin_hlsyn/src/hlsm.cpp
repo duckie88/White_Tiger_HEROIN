@@ -3,7 +3,7 @@
 
 //Calculates the dependency and gets cycle times for each operation
 
-bool scheduleASAP(int latency, std::vector<node>* unscheduled, std::vector<std::vector<node>>* ASAP) {
+bool scheduleASAP(unsigned int latency, std::vector<node>* unscheduled, std::vector<std::vector<node>>* ASAP) {
 	unsigned int scheduled = 0;
 	int i = 0;
 	unsigned int j, k, m;
@@ -79,12 +79,12 @@ bool scheduleASAP(int latency, std::vector<node>* unscheduled, std::vector<std::
 
 //Calculates the dependency and gets cycle times for each operation
 
-bool scheduleALAP(int latency, std::vector<node>* unscheduled, std::vector<std::vector<node>>* ALAP) {
+bool scheduleALAP(unsigned int latency, std::vector<node>* unscheduled, std::vector<std::vector<node>>* ALAP) {
 	
 	int i;
-	unsigned int j, k, m;
+	unsigned int j, k;
 	
-	for (i = 0; i < (*unscheduled).size(); ++i) {
+	for (i = 0; (unsigned int)i < (*unscheduled).size(); ++i) {
 		(*unscheduled).at(i).setCyclesElapsed(latency - 1);
 		//Don't want to schedule the inputs, reset scheduled to true
 		if ((*unscheduled).at(i).getPrevNodes().size() == 0) {	
@@ -96,13 +96,13 @@ bool scheduleALAP(int latency, std::vector<node>* unscheduled, std::vector<std::
 	}
 
 	//adding empty vectors to the times
-	for (i = 0; i < latency; ++i) {
+	for (i = 0; (unsigned int)i < latency; ++i) {
 		(*ALAP).push_back(std::vector<node>());
 	}
 
 	for (i = latency - 1; i >= 0; --i) {
 		for (j = 0; j < (*unscheduled).size(); ++j) {
-			if (i == latency - 1) {
+			if ((unsigned int)i == latency - 1) {
 				if ((*unscheduled).at(j).getNextNodes().size() == 1 && (*unscheduled).at(j).getNextIfNodes().size() == 0 && !(*unscheduled).at(j).getScheduled()) {
 					if ((*unscheduled).at(j).getDelay() > 1) {
 						(*ALAP).at(i - (*unscheduled).at(j).getDelay() + 1).push_back((*unscheduled).at(j));
@@ -153,7 +153,7 @@ bool scheduleALAP(int latency, std::vector<node>* unscheduled, std::vector<std::
 			}
 		}
 	}
-	for (i = 0; i < (*unscheduled).size(); ++i) {
+	for (i = 0; (unsigned int)i < (*unscheduled).size(); ++i) {
 		if ((*unscheduled).at(i).getCyclesElapsed() < 0) {
 			return false;
 		}
@@ -162,7 +162,6 @@ bool scheduleALAP(int latency, std::vector<node>* unscheduled, std::vector<std::
 }
 
 bool FDS(int totalNodes, std::vector<std::vector<node>>* ASAP, std::vector<std::vector<node>>* ALAP){
-	int i;
 	int scheduled = 0;
 	bool finished = false;
 

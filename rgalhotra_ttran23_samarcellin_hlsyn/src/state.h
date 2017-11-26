@@ -1,10 +1,6 @@
 #ifndef STATE_H
 #define STATE_H
 
-#include<string>
-#include<vector>
-#include<algorithm>
-
 #include "node.h"
 
 class state {
