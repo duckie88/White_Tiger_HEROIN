@@ -31,7 +31,7 @@ int main(int argc, char* argv[]) {
 		return EXIT_FAILURE;
 	}
 
-	for(i = 0; i < unscheduledNodes.size(); i++){ //reset unscheduled nodes for ALAP
+	for(i = 0; (unsigned int)i < unscheduledNodes.size(); i++){ //reset unscheduled nodes for ALAP
 		unscheduledNodes.at(i).setScheduled(false);
 	}
 

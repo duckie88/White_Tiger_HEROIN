@@ -16,7 +16,6 @@ int fileRead(char* fileName, std::vector<variable>* variables, std::vector<node>
 	int num = 1;
 	int input1, input2, input3, output;
 	int SIZE = 0;
-	int delay = 0;
 	bool SIGN = false;
 	bool ifFlag = false;
 	bool elseFlag = false;
@@ -177,28 +176,28 @@ bool checkMux(std::vector<std::string> results, std::vector<variable> variables,
 	bool check3 = false;
 	bool check4 = false;
 
-	for(i = 0; i < variables.size(); i++){
+	for(i = 0; (unsigned int)i < variables.size(); i++){
 		if( results[0] == variables.at(i).getName()){
 			check1 = true;
 			*output = i;
 			break;
 		}
 	}
-	for(i = 0; i < variables.size(); i++){
+	for(i = 0; (unsigned int)i < variables.size(); i++){
 		if( results[2] == variables.at(i).getName()){
 			check2 = true;
 			*input1 = i;
 			break;
 		}
 	}
-	for(i = 0; i < variables.size(); i++){
+	for(i = 0; (unsigned int)i < variables.size(); i++){
 		if( results[4] == variables.at(i).getName()){
 			check3 = true;
 			*input2 = i;
 			break;
 		}
 	}
-	for(i = 0; i < variables.size(); i++){
+	for(i = 0; (unsigned int)i < variables.size(); i++){
 		if( results[6] == variables.at(i).getName()){
 			check4 = true;
 			*input3 = i;
@@ -219,21 +218,21 @@ bool checkOperation(std::vector<std::string> results, std::vector<variable> vari
 	bool check2 = false;
 	bool check3 = false;
 
-	for(i = 0; i < variables.size(); i++){
+	for(i = 0; (unsigned int)i < variables.size(); i++){
 		if( results[0] == variables.at(i).getName()){
 			*output = i;
 			check1 = true;
 			break;
 		}
 	}
-	for(i = 0; i < variables.size(); i++){
+	for(i = 0; (unsigned int)i < variables.size(); i++){
 		if( results[2] == variables.at(i).getName()){
 			check2 = true;
 			*input1 = i;
 			break;
 		}
 	}
-	for(i = 0; i < variables.size(); i++){
+	for(i = 0; (unsigned int)i < variables.size(); i++){
 		if( results[4] == variables.at(i).getName()){
 			check3 = true;
 			*input2 = i;

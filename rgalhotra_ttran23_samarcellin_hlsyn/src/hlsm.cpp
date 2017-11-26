@@ -99,13 +99,13 @@ bool scheduleALAP(unsigned int latency, std::vector<node>* unscheduled, std::vec
 	}
 
 	//adding empty vectors to the times
-	for (i = 0; i < latency; ++i) {
+	for (i = 0; (unsigned int)i < latency; ++i) {
 		(*ALAP).push_back(std::vector<node>());
 	}
 
 	for (i = latency - 1; i >= 0; --i) {
 		for (j = 0; j < (*unscheduled).size(); ++j) {
-			if (i == latency - 1) {
+			if ((unsigned int)i == latency - 1) {
 				if ((*unscheduled).at(j).getNextNodes().size() == 1 && (*unscheduled).at(j).getNextIfNodes().size() == 0 && !(*unscheduled).at(j).getScheduled()) {
 					if ((*unscheduled).at(j).getDelay() > 1) {
 						(*ALAP).at(i - (*unscheduled).at(j).getDelay() + 1).push_back((*unscheduled).at(j));
@@ -156,7 +156,7 @@ bool scheduleALAP(unsigned int latency, std::vector<node>* unscheduled, std::vec
 			}
 		}
 	}
-	for (i = 0; i < (*unscheduled).size(); ++i) {
+	for (i = 0; (unsigned int)i < (*unscheduled).size(); ++i) {
 		if ((*unscheduled).at(i).getCyclesElapsed() < 0) {
 			return false;
 		}
@@ -179,8 +179,8 @@ bool FDS(int totalNodes, std::vector<std::vector<node>>* ASAP, std::vector<std::
 	
 	//calculate probability dist
 		//1/(ASAP - ALAP + 1)
-		for(i = 0; i < (*ALAP).size(); i++){
-			for(j = 0; j < (*ALAP).at(i).size(); j++){
+		for(i = 0; (unsigned int)i < (*ALAP).size(); i++){
+			for(j = 0; (unsigned int)j < (*ALAP).at(i).size(); j++){
 				std::cout << (*ALAP).at(i).at(j).getNodeNum();
 			}
 		}
