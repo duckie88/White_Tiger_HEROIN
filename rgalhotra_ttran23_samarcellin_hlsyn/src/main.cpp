@@ -8,6 +8,7 @@
 #include "hlsm.h"
 
 int main(int argc, char* argv[]) {
+	int i;
 	std::vector<variable> unscheduledIO;
 	std::vector<node> unscheduledNodes;
 	std::vector<state> states;
@@ -30,8 +31,12 @@ int main(int argc, char* argv[]) {
 		return EXIT_FAILURE;
 	}
 
+	for(i = 0; i < unscheduledNodes.size(); i++){ //reset unscheduled nodes for ALAP
+		unscheduledNodes.at(i).setScheduled(false);
+	}
+
 	if (!scheduleALAP(std::stoi(argv[2]), &unscheduledNodes, &scheduledALAP)) { //do ALAP
-		std::cout << "ALAP Error.\n";
+		std::cout << "ALAP failed to schedule all nodes.\n";
 		return EXIT_FAILURE;
 	}
 

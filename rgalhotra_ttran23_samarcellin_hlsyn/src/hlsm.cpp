@@ -10,39 +10,46 @@ bool scheduleASAP(unsigned int latency, std::vector<node>* unscheduled, std::vec
 	bool unschedPrevNode = false;
 	std::vector<node*> temp;
 
+	for(j = 0; j < (*unscheduled).size(); j++){
+		if((*unscheduled).at(j).getResult() == ""){
+			(*unscheduled).at(j).setScheduled(true);
+			scheduled++;
+		}
+	}
+
 	while (scheduled < (*unscheduled).size()){
 		(*ASAP).push_back(std::vector<node>());
 
 		for (j = 0; j < (*unscheduled).size(); ++j) {
 			unschedPrevNode = false;
-			if (i == 0) { //if there are no previous nodes
-				if ((*unscheduled).at(j).getPrevNodes().size() == 0) {
+			if ((*unscheduled).at(j).getScheduled() == false && (*unscheduled).at(j).getPrevNodes().size() == 0) {
 					(*ASAP).at(i).push_back((*unscheduled).at(j));
 					(*unscheduled).at(j).setAsapTime(i);
+					(*unscheduled).at(j).setScheduled(true);
 					scheduled++;
 
 					//deal with the delay (if exists)
 					for (k = 0; k < (*unscheduled).at(j).getNextNodes().size(); k++) {
 						if (i + (*unscheduled).at(j).getDelay() >= (*unscheduled).at(j).getNextNodes().at(k)->getCyclesElapsed()) {
-							(*unscheduled).at(j).getNextNodes().at(k)->setCyclesElapsed(i + (*unscheduled).at(j).getDelay() + 1);
+							(*unscheduled).at(j).getNextNodes().at(k)->setCyclesElapsed(i + (*unscheduled).at(j).getDelay());
 						}
 					}
 				}
-			}
-			else {
+			else if ((*unscheduled).at(j).getScheduled() == false) {
 				//schedule node if cycle is i
 				temp = (*unscheduled).at(j).getPrevNodes();
 				for (m = 0; m < temp.size(); m++) {
-					if (temp.at(m)->getAsapTime() == -1) {
+					if (temp.at(m)->getScheduled() == false) {
 						unschedPrevNode = true;
 					}
 				}
 				if ((*unscheduled).at(j).getCyclesElapsed() == i && !unschedPrevNode) {
 					(*ASAP).at(i).push_back((*unscheduled).at(j));
 					(*unscheduled).at(j).setAsapTime(i);
+					(*unscheduled).at(j).setScheduled(true);
 					scheduled++;
 					//update node cycle time
-					for (k = 1; k < (*unscheduled).at(j).getNextNodes().size(); ++k) {
+					for (k = 0; k < (*unscheduled).at(j).getNextNodes().size(); ++k) {
 						if (i + (*unscheduled).at(j).getDelay() >(*unscheduled).at(j).getNextNodes().at(k)->getCyclesElapsed()) {
 							(*unscheduled).at(j).getNextNodes().at(k)->setCyclesElapsed(i + (*unscheduled).at(j).getDelay());
 						}
@@ -84,25 +91,21 @@ bool scheduleALAP(unsigned int latency, std::vector<node>* unscheduled, std::vec
 	int i;
 	unsigned int j, k;
 	
-	for (i = 0; (unsigned int)i < (*unscheduled).size(); ++i) {
-		(*unscheduled).at(i).setCyclesElapsed(latency - 1);
-		//Don't want to schedule the inputs, reset scheduled to true
-		if ((*unscheduled).at(i).getPrevNodes().size() == 0) {	
-			(*unscheduled).at(i).setScheduled(true);
-		} //Else, all others are operations, thus not scheduled
-		else {
-			(*unscheduled).at(i).setScheduled(false);
+	for(j = 0; j < (*unscheduled).size(); j++){ //deal with the input nodes (don't want to schedule them)
+		if((*unscheduled).at(j).getResult() == ""){
+			(*unscheduled).at(j).setScheduled(true);
+			(*unscheduled).at(j).setCyclesElapsed(0);
 		}
 	}
 
 	//adding empty vectors to the times
-	for (i = 0; (unsigned int)i < latency; ++i) {
+	for (i = 0; i < latency; ++i) {
 		(*ALAP).push_back(std::vector<node>());
 	}
 
 	for (i = latency - 1; i >= 0; --i) {
 		for (j = 0; j < (*unscheduled).size(); ++j) {
-			if ((unsigned int)i == latency - 1) {
+			if (i == latency - 1) {
 				if ((*unscheduled).at(j).getNextNodes().size() == 1 && (*unscheduled).at(j).getNextIfNodes().size() == 0 && !(*unscheduled).at(j).getScheduled()) {
 					if ((*unscheduled).at(j).getDelay() > 1) {
 						(*ALAP).at(i - (*unscheduled).at(j).getDelay() + 1).push_back((*unscheduled).at(j));
@@ -153,7 +156,7 @@ bool scheduleALAP(unsigned int latency, std::vector<node>* unscheduled, std::vec
 			}
 		}
 	}
-	for (i = 0; (unsigned int)i < (*unscheduled).size(); ++i) {
+	for (i = 0; i < (*unscheduled).size(); ++i) {
 		if ((*unscheduled).at(i).getCyclesElapsed() < 0) {
 			return false;
 		}
@@ -163,15 +166,24 @@ bool scheduleALAP(unsigned int latency, std::vector<node>* unscheduled, std::vec
 
 bool FDS(int totalNodes, std::vector<std::vector<node>>* ASAP, std::vector<std::vector<node>>* ALAP){
 	int scheduled = 0;
+	int i, j;
+	std::vector<float> mulDist;
+	std::vector<float> divDist;
+	std::vector<float> addDist;
+	std::vector<float> logicDist;
+
 	bool finished = false;
 
 	while(!finished){
-	//calculate time frames
-		//ASAP and ALAP
-
-
-	//calculate probability
+	//calculate time frames - we did this in actual scheduling by setting asap and alap time variables
+	
+	//calculate probability dist
 		//1/(ASAP - ALAP + 1)
+		for(i = 0; i < (*ALAP).size(); i++){
+			for(j = 0; j < (*ALAP).at(i).size(); j++){
+				std::cout << (*ALAP).at(i).at(j).getNodeNum();
+			}
+		}
 
 
 	//self force
