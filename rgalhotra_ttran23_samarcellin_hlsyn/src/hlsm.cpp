@@ -98,54 +98,54 @@ bool scheduleALAP(unsigned int latency, std::vector<node>* unscheduled, std::vec
 		}
 	}
 
-	//adding empty vectors to the times
+	//adding empty vectors to the times -- populate the amount of timeslots to match latency
 	for (i = 0; (unsigned int)i < latency; ++i) {
 		(*ALAP).push_back(std::vector<node>());
 	}
 
-	for (i = latency - 1; i >= 0; --i) {
+	for (i = latency - 1; i >= 0; --i) { //start at last timeslot and work backwards
 		for (j = 0; j < (*unscheduled).size(); ++j) {
-			if ((unsigned int)i == latency - 1) {
-				if ((*unscheduled).at(j).getNextNodes().size() == 1 && (*unscheduled).at(j).getNextIfNodes().size() == 0 && !(*unscheduled).at(j).getScheduled()) {
-					if ((*unscheduled).at(j).getDelay() > 1) {
-						(*ALAP).at(i - (*unscheduled).at(j).getDelay() + 1).push_back((*unscheduled).at(j));
+			if ((unsigned int)i == latency - 1) { //last timeslot
+				if ((*unscheduled).at(j).getNextNodes().size() == 1 && (*unscheduled).at(j).getNextIfNodes().size() == 0 && !(*unscheduled).at(j).getScheduled()) { //???
+					if ((*unscheduled).at(j).getDelay() > 1) { //if delay is longer than one cycle
+						(*ALAP).at(i - (*unscheduled).at(j).getDelay() + 1).push_back((*unscheduled).at(j)); //set it so that the delay ends in last timeslot?
 						(*unscheduled).at(j).setAlapTime(i - (*unscheduled).at(j).getDelay() + 1);
 						(*unscheduled).at(j).setScheduled(true);
-						for (k = 0; k < (*unscheduled).at(j).getPrevNodes().size(); ++k) {
-							if (i - (*unscheduled).at(j).getDelay() + 1 < (*unscheduled).at(j).getPrevNodes().at(k)->getCyclesElapsed()) {
-								(*unscheduled).at(j).getPrevNodes().at(k)->setCyclesElapsed(i - (*unscheduled).at(j).getDelay() + 1);
+						for (k = 0; k < (*unscheduled).at(j).getPrevNodes().size(); ++k) { //work backwards from last node
+							if (i - (*unscheduled).at(j).getDelay() + 1 < (*unscheduled).at(j).getPrevNodes().at(k)->getCyclesElapsed()) { //???
+								(*unscheduled).at(j).getPrevNodes().at(k)->setCyclesElapsed(i - (*unscheduled).at(j).getDelay() + 1); //update Cycles Elapsed?
 							}
 						}
 					}
-					else {
-						(*ALAP).at(i).push_back((*unscheduled).at(j));
+					else { //if delay is one cycle
+						(*ALAP).at(i).push_back((*unscheduled).at(j)); //add to last timeslot
 						(*unscheduled).at(j).setAlapTime(i);
 						(*unscheduled).at(j).setScheduled(true);
-						for (k = 0; k < (*unscheduled).at(j).getPrevNodes().size(); ++k) {
-							if (i - (*unscheduled).at(j).getDelay() < (*unscheduled).at(j).getPrevNodes().at(k)->getCyclesElapsed()) {
+						for (k = 0; k < (*unscheduled).at(j).getPrevNodes().size(); ++k) { //work backwards from current node
+							if (i - (*unscheduled).at(j).getDelay() < (*unscheduled).at(j).getPrevNodes().at(k)->getCyclesElapsed()) { //???
 								(*unscheduled).at(j).getPrevNodes().at(k)->setCyclesElapsed(i - (*unscheduled).at(j).getDelay());
 							}
 						}
 					}
 				}
 			}
-			else {
-				if ((*unscheduled).at(j).getCyclesElapsed() == i && !(*unscheduled).at(j).getScheduled()) {
-					if ((*unscheduled).at(j).getDelay() > 1) {
-						(*ALAP)[i - (*unscheduled).at(j).getDelay()].push_back((*unscheduled).at(j));
+			else { //if not last timeslot
+				if ((*unscheduled).at(j).getCyclesElapsed() == i && !(*unscheduled).at(j).getScheduled()) { //if not scheduled
+					if ((*unscheduled).at(j).getDelay() > 1) { //if delay is longer than 1
+						(*ALAP)[i - (*unscheduled).at(j).getDelay()].push_back((*unscheduled).at(j)); //why is this so messy? assuming same behavior as before
 						(*unscheduled).at(j).setAlapTime(i - (*unscheduled).at(j).getDelay());
 						(*unscheduled).at(j).setScheduled(true);
-						for (k = 0; k < (*unscheduled).at(j).getPrevNodes().size(); ++k) {
+						for (k = 0; k < (*unscheduled).at(j).getPrevNodes().size(); ++k) { //work backwards from current node
 							if (i - (*unscheduled).at(j).getDelay() - 1 < (*unscheduled).at(j).getPrevNodes().at(k)->getCyclesElapsed()) {
 								(*unscheduled).at(j).getPrevNodes().at(k)->setCyclesElapsed(i - (*unscheduled).at(j).getDelay());
 							}
 						}
 					}
-					else {
-						(*ALAP).at(i).push_back((*unscheduled).at(j));
+					else { //if delay is 1
+						(*ALAP).at(i).push_back((*unscheduled).at(j)); //add to current timeslot
 						(*unscheduled).at(j).setAlapTime(i);
 						(*unscheduled).at(j).setScheduled(true);
-						for (k = 0; k < (*unscheduled).at(j).getPrevNodes().size(); ++k) {
+						for (k = 0; k < (*unscheduled).at(j).getPrevNodes().size(); ++k) { //work backwards from current node
 							if (i - (*unscheduled).at(j).getDelay() < (*unscheduled).at(j).getPrevNodes().at(k)->getCyclesElapsed()) {
 								(*unscheduled).at(j).getPrevNodes().at(k)->setCyclesElapsed(i - (*unscheduled).at(j).getDelay());
 							}
@@ -161,7 +161,7 @@ bool scheduleALAP(unsigned int latency, std::vector<node>* unscheduled, std::vec
 			return false;
 		}
 	}
-	return true;
+	return true; //shouldn't we check for if all unscheduled nodes have true scheduled?
 }
 
 bool FDS(int totalNodes, std::vector<std::vector<node>>* ASAP, std::vector<std::vector<node>>* ALAP){
