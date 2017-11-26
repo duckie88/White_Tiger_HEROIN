@@ -10,8 +10,6 @@ private:
 public:
 	state();
 	void addNode(node addNode);
-	std::vector<node> getNodes() { //WHY
-		return this->nodes;
-	}
+	std::vector<node> getNodes();
 };
 #endif // STATE_H
