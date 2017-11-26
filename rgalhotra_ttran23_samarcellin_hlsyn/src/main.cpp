@@ -47,9 +47,7 @@ int main(int argc, char* argv[]) {
 	//}
 	//std::cout << "\n\n\n";
 
-
-
-	//output verilog #need to know how we're handling FDS output
+	//output verilog
 	if (!generateVerilogFile(unscheduledIO, states, argv[3])) {
 		std::cout << "Output Error.\n";
 		return EXIT_FAILURE;
