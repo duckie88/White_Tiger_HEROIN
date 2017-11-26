@@ -317,7 +317,6 @@ void generateStates(std::vector<state> states, char* outFileStr, std::vector<var
 				outFS << "s" << (i + 3) << ";" << std::endl;
 			}
 			else {
-
 				outFS << "sFinal;" << std::endl;
 			}
 			outFS << "end" << std::endl;

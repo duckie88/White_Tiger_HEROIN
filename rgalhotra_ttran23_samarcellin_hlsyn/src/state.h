@@ -7,8 +7,6 @@
 
 #include "node.h"
 
-class state;
-
 class state {
 private:
 	std::vector<node> nodes;
@@ -16,6 +14,8 @@ private:
 public:
 	state();
 	void addNode(node addNode);
-	std::vector<node> getNodes();
+	std::vector<node> getNodes() { //WHY
+		return this->nodes;
+	}
 };
 #endif // STATE_H
