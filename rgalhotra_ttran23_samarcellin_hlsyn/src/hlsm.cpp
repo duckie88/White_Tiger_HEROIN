@@ -157,8 +157,9 @@ bool scheduleALAP(unsigned int latency, std::vector<node>* unscheduled, std::vec
 		}
 	}
 	for (i = 0; (unsigned int)i < (*unscheduled).size(); ++i) {
+		if (!(*unscheduled).at(i).getScheduled()) std::cout << (*unscheduled).at(i).getResult() << std::endl;
 		if ((*unscheduled).at(i).getCyclesElapsed() < 0) {
-			return false;
+			//return false;
 		}
 	}
 	return true; //shouldn't we check for if all unscheduled nodes have true scheduled?
