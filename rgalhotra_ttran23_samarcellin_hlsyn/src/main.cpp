@@ -8,9 +8,10 @@
 #include "hlsm.h"
 
 int main(int argc, char* argv[]) {
-	int i;
+	int i, j;
 	std::vector<variable> unscheduledIO;
 	std::vector<node> unscheduledNodes;
+	std::vector<node> temp;
 	std::vector<state> states;
 	std::vector<std::vector<node>> scheduledASAP, scheduledALAP;
 	
@@ -33,6 +34,8 @@ int main(int argc, char* argv[]) {
 
 	for(i = 0; (unsigned int)i < unscheduledNodes.size(); i++){ //reset unscheduled nodes for ALAP
 		unscheduledNodes.at(i).setScheduled(false);
+		unscheduledNodes.at(i).setCyclesElapsed(-1);
+		//std::cout << unscheduledNodes.at(i).getResult() << "\t" << unscheduledNodes.at(i).getCyclesElapsed() << std::endl;
 	}
 
 	if (!scheduleALAP(std::stoi(argv[2]), &unscheduledNodes, &scheduledALAP)) { //do ALAP
