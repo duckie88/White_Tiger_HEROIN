@@ -217,3 +217,34 @@ bool FDS(int totalNodes, std::vector<std::vector<node>>* ASAP, std::vector<std::
 
 	return true;
 }
+
+std::vector<state> createStates(std::vector<std::vector<node>> FDS) {
+	std::vector<state> states;
+	int i = 0;
+	int j = 0;
+
+	for (i = 0; (unsigned int)i < FDS.size(); i++) { //add each node to a state corresponding with its time
+		createNewState(&states);
+		for (j = 0; (unsigned int)j < FDS.at(i).size(); j++) {
+			states.at(i).addNode(FDS.at(i).at(j));
+		}
+	}
+	for (i = 0; (unsigned int)i < states.size(); i++) { //remove states that have no nodes
+		if (states.at(i).getNodes().size() == 0) {
+			states.erase(states.begin() + i);
+			i--;
+		}
+	}
+	//if statements
+	for (i = 0; (unsigned int)i < states.size(); i++) {
+		for (j = 0; (unsigned int)j < states.at(i).getNodes().size(); j++) {
+			//if it's an if statement do shit
+		}
+	}
+	return states;
+}
+
+void createNewState(std::vector<state>* states) {
+	state* newState = new state();
+	(*states).push_back(*newState);
+}

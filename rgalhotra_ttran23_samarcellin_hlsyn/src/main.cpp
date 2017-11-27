@@ -56,7 +56,7 @@ int main(int argc, char* argv[]) {
 	//std::cout << "\n\n\n";
 
 	//output verilog
-	if (!generateVerilogFile(unscheduledIO, states, argv[3])) {
+	if (!generateVerilogFile(unscheduledIO, createStates(scheduledASAP), argv[3])) { //wrong arg for createStates, but FDS output not created yet
 		std::cout << "Output Error.\n";
 		return EXIT_FAILURE;
 	}
