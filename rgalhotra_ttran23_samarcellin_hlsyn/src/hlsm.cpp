@@ -141,7 +141,7 @@ bool scheduleALAP(unsigned int latency, std::vector<node>* unscheduled, std::vec
 			else { //if not last timeslot
 				if ((*unscheduled).at(j).getCyclesElapsed() == i && !(*unscheduled).at(j).getScheduled()) { //if not scheduled
 					if ((*unscheduled).at(j).getDelay() > 1) { //if delay is longer than 1
-						(*unscheduled).at(j).setAlapTime(i - (*unscheduled).at(j).getDelay());
+						(*unscheduled).at(j).setAlapTime(i - (*unscheduled).at(j).getDelay() + 1);
 						(*unscheduled).at(j).setScheduled(true);
 						(*ALAP).at(i - (*unscheduled).at(j).getDelay() + 1).push_back((*unscheduled).at(j)); 
 						for (k = 0; k < (*unscheduled).at(j).getPrevNodes().size(); ++k) { //work backwards from current node
@@ -182,9 +182,9 @@ bool scheduleALAP(unsigned int latency, std::vector<node>* unscheduled, std::vec
 	return true; //shouldn't we check for if all unscheduled nodes have true scheduled? // ANSWER: that is what the for loop with the return false does
 }
 
-bool FDS(int totalNodes, std::vector<std::vector<node>>* ASAP, std::vector<std::vector<node>>* ALAP){
+bool FDS(int totalNodes, int latency, std::vector<node>* nodes){
 	int scheduled = 0;
-	int i, j;
+	int i, j, temp, time;
 	std::vector<float> mulDist;
 	std::vector<float> divDist;
 	std::vector<float> addDist;
@@ -192,21 +192,64 @@ bool FDS(int totalNodes, std::vector<std::vector<node>>* ASAP, std::vector<std::
 
 	bool finished = false;
 
-	while(!finished){
-	//calculate time frames - we did this in actual scheduling by setting asap and alap time variables
-	
-	//calculate probability dist
-		//1/(ASAP - ALAP + 1)
+	for(i = 0; i < totalNodes; i++){  //"schedule" input nodes
+		if((*nodes).at(i).getResult() == ""){
+			(*nodes).at(i).setScheduled(true);
+			scheduled++;
+		}
+	}
 
-	//self force
-		//for each possible time
-		// sf = distribution@thisT(1-probability) + distribution@otherT1(0-probability) + distribution@otherT2(0 -probability) ...
+	while(!finished){
+	//calculate probability dist
+		//1/(ALAP - ASAP + 1)
+		for(i = 0; i < totalNodes; i++){
+			temp = (*nodes).at(i).getAlapTime() - (*nodes).at(i).getAsapTime() + 1;
+			(*nodes).at(i).setProbability(1.0/temp);
+			if((*nodes).at(i).getResult() == ""){ //make sure not to set inputs!
+				(*nodes).at(i).setProbability(0);
+			}
+			//std::cout << (*nodes).at(i).getProbability() << std::endl;
+		}
+
+	//calculate probability distributions
+		for(time = 0; time < latency; time++){
+			addDist.push_back(0);
+			divDist.push_back(0);
+			mulDist.push_back(0);
+			logicDist.push_back(0);
+			for(i = 0; i < totalNodes; i++){
+				if((*nodes).at(i).getOperation() == "+" || (*nodes).at(i).getOperation() == "-"){  //add and sub distribution
+					if(time <= (*nodes).at(i).getAlapTime() && time >= (*nodes).at(i).getAsapTime()){ //check to be sure we're within 
+						addDist.at(time) = addDist.at(time) + (*nodes).at(i).getProbability();
+					}
+				}
+				else if((*nodes).at(i).getOperation() == "*"){  //multiply distribution
+					if(time <= (*nodes).at(i).getAlapTime() && time >= (*nodes).at(i).getAsapTime()){ //check to be sure we're within 
+						mulDist.at(time) = mulDist.at(time) + (*nodes).at(i).getProbability();
+					}
+				}
+				else if((*nodes).at(i).getOperation() == "/" || (*nodes).at(i).getOperation() == "%"){  //div and mod distribution
+					if(time <= (*nodes).at(i).getAlapTime() && time >= (*nodes).at(i).getAsapTime()){ //check to be sure we're within 
+						divDist.at(time) = divDist.at(time) + (*nodes).at(i).getProbability();
+					}
+				}
+				else{  //logic distribution
+					if(time <= (*nodes).at(i).getAlapTime() && time >= (*nodes).at(i).getAsapTime()){ //check to be sure we're within 
+						logicDist.at(time) = logicDist.at(time) + (*nodes).at(i).getProbability();
+					}
+				}
+			}
+		}
+
+	//SELF FORCE
+	// sf = distribution@thisT(1-probability) + distribution@otherT1(0-probability) + distribution@otherT2(0 -probability) ...
 
 	//predecesor force
 	//sucessor force
-	///schedule least force
-		scheduled++;
-	//update timeframe of scheduled node (or else future pred/succ foces will be off)
+	//schedule least force
+		
+	scheduled++;
+	//update timeframe (asap and alap = same number) of scheduled node (or else future pred/succ foces will be off)
 		
 	//check exit condition (all nodes scheduled)
 		if(scheduled == totalNodes){

@@ -24,6 +24,7 @@ private:
 	int asapTime;
 	int alapTime;
 	int cyclesElapsed;
+	float probability;
 	char visited;
 	bool scheduled;
 	bool conditional;
@@ -69,7 +70,9 @@ public:
 	int getCyclesElapsed();
 	void setCyclesElapsed(int cycles);
 	
-	
+	float getProbability();
+	void setProbability(float probability);
+
 	bool getScheduled();
 	void setScheduled(bool s);
 	bool getConditional();

@@ -11,7 +11,6 @@ int main(int argc, char* argv[]) {
 	int i, j;
 	std::vector<variable> unscheduledIO;
 	std::vector<node> unscheduledNodes;
-	std::vector<node> temp;
 	std::vector<state> states;
 	std::vector<std::vector<node>> scheduledASAP, scheduledALAP;
 	
@@ -43,17 +42,15 @@ int main(int argc, char* argv[]) {
 		return EXIT_FAILURE;
 	}
 
+	for(i = 0; (unsigned int)i < unscheduledNodes.size(); i++){ //reset unscheduled nodes for FDS
+		unscheduledNodes.at(i).setScheduled(false);
+	}
+
 	//do FDS   FINALLY
-	if (!FDS(unscheduledNodes.size(), &scheduledASAP,  &scheduledALAP)){
+	if (!FDS(unscheduledNodes.size(),std::stoi(argv[2]), &unscheduledNodes)){
 		std::cout << "FDS Error.\n";
 		return EXIT_FAILURE;
 	}
-
-	//test print of results
-	//for (unsigned int i = 0; i < unscheduledNodes.size(); i++) {
-	//	std::cout << unscheduledNodes.at(i).getNodeNum() << "\t" << unscheduledNodes.at(i).getOperation() << std::endl;
-	//}
-	//std::cout << "\n\n\n";
 
 	//output verilog
 	if (!generateVerilogFile(unscheduledIO, states, argv[3])) {
