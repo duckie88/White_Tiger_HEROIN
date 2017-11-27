@@ -224,7 +224,8 @@ std::vector<state> createStates(std::vector<std::vector<node>> FDS) {
 	int j = 0;
 
 	for (i = 0; (unsigned int)i < FDS.size(); i++) { //add each node to a state corresponding with its time
-		createNewState(&states);
+		state* newState = new state();
+		states.push_back(*newState);
 		for (j = 0; (unsigned int)j < FDS.at(i).size(); j++) {
 			states.at(i).addNode(FDS.at(i).at(j));
 		}
@@ -242,9 +243,4 @@ std::vector<state> createStates(std::vector<std::vector<node>> FDS) {
 		}
 	}
 	return states;
-}
-
-void createNewState(std::vector<state>* states) {
-	state* newState = new state();
-	(*states).push_back(*newState);
 }
