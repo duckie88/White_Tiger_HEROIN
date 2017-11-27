@@ -106,7 +106,7 @@ bool scheduleALAP(unsigned int latency, std::vector<node>* unscheduled, std::vec
 
 	for (i = latency - 1; i >= 0; --i) { //start at last timeslot and work backwards
 		for (j = 0; j < (*unscheduled).size(); ++j) {
-			if (i == latency - 1) { //last timeslot
+			if ((unsigned int)i == latency - 1) { //last timeslot
 				if ((*unscheduled).at(j).getNextNodes().size() == 0 && (*unscheduled).at(j).getNextIfNodes().size() == 0 && !(*unscheduled).at(j).getScheduled()) { //if no node comes after me, and  I am unscheduled
 					if ((*unscheduled).at(j).getDelay() > 1) { //if delay is longer than one cycle
 						(*unscheduled).at(j).setAlapTime(i - (*unscheduled).at(j).getDelay() + 1);
@@ -117,7 +117,7 @@ bool scheduleALAP(unsigned int latency, std::vector<node>* unscheduled, std::vec
 							if((*unscheduled).at(j).getPrevNodes().at(k)->getCyclesElapsed()  == -1){
 								(*unscheduled).at(j).getPrevNodes().at(k)->setCyclesElapsed(i-1);
 							}
-							for(m = 0; m < (*unscheduled).at(j).getPrevNodes().at(k)->getPrevNodes().size(); m++){
+							for(m = 0; (unsigned int)m < (*unscheduled).at(j).getPrevNodes().at(k)->getPrevNodes().size(); m++){
 								(*unscheduled).at(j).getPrevNodes().at(k)->getPrevNodes().at(m)->setCyclesElapsed(i-2);
 							}
 						}
@@ -131,7 +131,7 @@ bool scheduleALAP(unsigned int latency, std::vector<node>* unscheduled, std::vec
 							if((*unscheduled).at(j).getPrevNodes().at(k)->getCyclesElapsed()  == -1){
 								(*unscheduled).at(j).getPrevNodes().at(k)->setCyclesElapsed(i-1);
 							}
-							for(m = 0; m < (*unscheduled).at(j).getPrevNodes().at(k)->getPrevNodes().size(); m++){
+							for(m = 0; (unsigned int)m < (*unscheduled).at(j).getPrevNodes().at(k)->getPrevNodes().size(); m++){
 								(*unscheduled).at(j).getPrevNodes().at(k)->getPrevNodes().at(m)->setCyclesElapsed(i-2);
 							}
 						}
@@ -149,7 +149,7 @@ bool scheduleALAP(unsigned int latency, std::vector<node>* unscheduled, std::vec
 							if((*unscheduled).at(j).getPrevNodes().at(k)->getCyclesElapsed()  == -1){
 								(*unscheduled).at(j).getPrevNodes().at(k)->setCyclesElapsed(i-1);
 							}
-							for(m = 0; m < (*unscheduled).at(j).getPrevNodes().at(k)->getPrevNodes().size(); m++){
+							for(m = 0; (unsigned int)m < (*unscheduled).at(j).getPrevNodes().at(k)->getPrevNodes().size(); m++){
 								(*unscheduled).at(j).getPrevNodes().at(k)->getPrevNodes().at(m)->setCyclesElapsed(i-2);
 							}
 						}
@@ -163,7 +163,7 @@ bool scheduleALAP(unsigned int latency, std::vector<node>* unscheduled, std::vec
 							if((*unscheduled).at(j).getPrevNodes().at(k)->getCyclesElapsed()  == -1){
 								(*unscheduled).at(j).getPrevNodes().at(k)->setCyclesElapsed(i-1);
 							}
-							for(m = 0; m < (*unscheduled).at(j).getPrevNodes().at(k)->getPrevNodes().size(); m++){
+							for(m = 0; (unsigned int)m < (*unscheduled).at(j).getPrevNodes().at(k)->getPrevNodes().size(); m++){
 								(*unscheduled).at(j).getPrevNodes().at(k)->getPrevNodes().at(m)->setCyclesElapsed(i-2);
 							}
 						}
@@ -173,7 +173,7 @@ bool scheduleALAP(unsigned int latency, std::vector<node>* unscheduled, std::vec
 			}
 		}
 	}
-	for (i = 0; i < (*unscheduled).size(); ++i) { //fuck up check (did everything get scheduled?)
+	for (i = 0; (unsigned int)i < (*unscheduled).size(); ++i) { //fuck up check (did everything get scheduled?)
 		if (!(*unscheduled).at(i).getScheduled()){
 			//std::cout << (*unscheduled).at(i).getResult();
 			return false;

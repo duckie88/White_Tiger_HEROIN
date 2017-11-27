@@ -8,7 +8,7 @@
 #include "hlsm.h"
 
 int main(int argc, char* argv[]) {
-	int i, j;
+	int i;
 	std::vector<variable> unscheduledIO;
 	std::vector<node> unscheduledNodes;
 	std::vector<node> temp;
