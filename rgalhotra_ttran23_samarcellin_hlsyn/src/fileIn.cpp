@@ -68,6 +68,7 @@ int fileRead(char* fileName, std::vector<variable>* variables, std::vector<node>
 					temp[j] = '\0';
 					j++;
 				}
+
 				std::istringstream(temp) >> SIZE;
 				for (i = 2; i < results.size(); i++) { //create a node for each variable with these stats
 					temp = results[i]; //get rid of commas
@@ -91,10 +92,12 @@ int fileRead(char* fileName, std::vector<variable>* variables, std::vector<node>
 			}
 			//end if-else
 			
-			
-			
 			// For everything else
 			else if (results[1] == "=") {
+
+				// Trim the \t from output var
+				results[0].erase(std::remove(results[0].begin(), results[0].end(), '\t'), results[0].end());
+
 				if(results[3] == "?") {
 					if(checkMux(results, *variables, &output, &input1, &input2, &input3)){ //make sure no errors in input
 
