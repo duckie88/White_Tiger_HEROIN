@@ -8,7 +8,7 @@
 #include "hlsm.h"
 
 int main(int argc, char* argv[]) {
-	int i, j;
+	int i;
 	std::vector<variable> unscheduledIO;
 	std::vector<node> unscheduledNodes;
 	std::vector<state> states;
@@ -53,7 +53,7 @@ int main(int argc, char* argv[]) {
 	}
 
 	//output verilog
-	if (!generateVerilogFile(unscheduledIO, states, argv[3])) {
+	if (!generateVerilogFile(unscheduledIO, createStates(scheduledASAP), argv[3])) { //wrong arg for createStates, but FDS output not created yet
 		std::cout << "Output Error.\n";
 		return EXIT_FAILURE;
 	}

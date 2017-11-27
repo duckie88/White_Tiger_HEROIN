@@ -10,7 +10,7 @@ void generateIO(std::vector<variable> list, char* outFileStr) {
 	myFile << std::endl;
 	//std::cout << std::endl;
 	// Looping through
-	for (int i = 0; i < list.size(); i++) {
+	for (int i = 0; (unsigned int)i < list.size(); i++) {
 		//list[i].getName() << list[i].getType() << list[i].getSIGN() << list[i].getDataSize() 
 		ss = std::stringstream();
 		if (list.at(i).getSIGN() == true) {
@@ -57,12 +57,11 @@ std::string generateModule(std::string result, std::string oper1, std::string op
 	int dataWidth2 = 0;
 	bool real3 = false;
 	int dataWidth3 = 0;
-	bool sign3 = false;
 	int datawidth = 0;
 	int indata = 0;
 
 	//checking all variables were correctly declared
-	for (i = 0; i < ioList.size(); i++) {
+	for (i = 0; (unsigned int)i < ioList.size(); i++) {
 		if (ioList.at(i).getName() == oper1) {
 			real1 = true;
 			sign1 = ioList.at(i).getSIGN();
@@ -77,7 +76,6 @@ std::string generateModule(std::string result, std::string oper1, std::string op
 		}
 		if (ioList.at(i).getName() == result) {
 			real3 = true;
-			sign3 = ioList.at(i).getSIGN();
 			dataWidth3 = ioList.at(i).getDataSize();
 			if (ioList.at(i).getDataSize() > datawidth) datawidth = ioList.at(i).getDataSize();
 		}
@@ -160,26 +158,20 @@ std::string generateModule(std::string result, std::string oper1, std::string op
 std::string generateMux(std::string result, std::string oper1, std::string oper2, std::string oper3, int num, std::vector<variable>ioList) {
 	int i = 0;
 	bool real1 = false;
-	bool sign1 = false;
 	bool real2 = false;
-	bool sign2 = false;
-	bool sign3 = false;
 	bool real3 = false;
 	int datawidth = 0;
 
 	//checking all variables were declared
-	for (i = 0; i < ioList.size(); i++) {
+	for (i = 0; (unsigned int)i < ioList.size(); i++) {
 		if (ioList.at(i).getName() == oper1) {
 			real1 = true;
-			sign1 = ioList.at(i).getSIGN();
 		}
 		if (ioList.at(i).getName() == oper2) {
 			real2 = true;
-			sign2 = ioList.at(i).getSIGN();
 		}
 		if (ioList.at(i).getName() == result) {
 			real3 = true;
-			sign3 = ioList.at(i).getSIGN();
 			if (ioList.at(i).getDataSize() > datawidth) datawidth = ioList.at(i).getDataSize();
 		}
 	}
@@ -213,14 +205,14 @@ bool generateVerilogFile(std::vector<variable> ioList, std::vector<state> states
 	//std::cout << "module " << moduleName << "( ";
 
 	// Putting all input/output variables into a secondary vector
-	for (int i = 0; i < ioList.size(); i++) {
+	for (int i = 0; (unsigned int)i < ioList.size(); i++) {
 		if (ioList.at(i).getType().compare("input") == 0 || ioList.at(i).getType().compare("output") == 0) {
 			ioHeaderList.push_back(ioList.at(i));
 		}
 	}
 
 	// Traverses secondary vector and just puts the names
-	for (int i = 0; i < ioHeaderList.size() - 1; i++) {
+	for (int i = 0; (unsigned int)i < ioHeaderList.size() - 1; i++) {
 		outFS << ioHeaderList.at(i).getName() << ", ";
 		//std::cout << ioHeaderList.at(i).getName() << ", ";
 	}
@@ -240,7 +232,7 @@ bool generateVerilogFile(std::vector<variable> ioList, std::vector<state> states
 
 	// Generates the list of parameters
 	outFS << "parameter sWait = 0,";
-	for (i = 0; i < states.size(); i++) {
+	for (i = 0; (unsigned int)i < states.size(); i++) {
 		outFS << " s" << i + 2 << " = " << i + 1 << ",";
 	}
 	outFS << " sFinal = " << i + 1 << ";" << std::endl << std::endl;
@@ -251,10 +243,10 @@ bool generateVerilogFile(std::vector<variable> ioList, std::vector<state> states
 	// Reset state.
 	outFS << "if(Rst == 1) begin" << std::endl;
 	outFS << "state <= sWait;" << std::endl;
-	for (i = 0; i < ioList.size(); i++) {
+	for (i = 0; (unsigned int)i < ioList.size(); i++) {
 		outFS << ioList.at(i).getName() << " <= 0;" << std::endl;
 	}
-	for (i = 0; i < ioList.size(); i++) {
+	for (i = 0; (unsigned int)i < ioList.size(); i++) {
 		if(ioList.at(i).getType() == "output")
 			outFS << ioList.at(i).getName() << " <= 0;" << std::endl;
 	}
@@ -303,17 +295,17 @@ void generateStates(std::vector<state> states, char* outFileStr, std::vector<var
 		std::cout << "Could not open output file." << std::endl;
 		exit(EXIT_FAILURE);
 	}
-	for (i = 0; i < states.size(); i++) {
+	for (i = 0; (unsigned int)i < states.size(); i++) {
 		outFS << "s";
 		outFS << (i + 2);
 		outFS << ": begin" << std::endl;
-		for (j = 0; j < states.at(i).getNodes().size(); j++) {
+		for (j = 0; (unsigned int)j < states.at(i).getNodes().size(); j++) {
 			if (states.at(i).getNodes().at(j).getOperation() == "?")
 				outFS << generateMux(states.at(i).getNodes().at(j).getResult(), states.at(i).getNodes().at(j).getVar1(), states.at(i).getNodes().at(j).getVar2(), states.at(i).getNodes().at(j).getVar3(), (i + j), ioList) << std::endl;
 			else
 				outFS << generateModule(states.at(i).getNodes().at(j).getResult(), states.at(i).getNodes().at(j).getVar1(), states.at(i).getNodes().at(j).getVar2(), states.at(i).getNodes().at(j).getOperation(), (i + j), ioList) << std::endl;
 			outFS << "state <= ";
-			if (i < states.size() - 1) {
+			if ((unsigned int)i < states.size() - 1) {
 				outFS << "s" << (i + 3) << ";" << std::endl;
 			}
 			else {
