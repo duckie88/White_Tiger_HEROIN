@@ -19,6 +19,7 @@ private:
 	std::vector<node*> nextNodes;
 	std::vector<node*> nextIfNodes;
 	std::vector<node*> nextElseNodes;
+	std::vector<double> selfForce;
 	int nodeNum;
 	int delay;
 	int asapTime;
@@ -70,6 +71,9 @@ public:
 	
 	float getProbability();
 	void setProbability(float probability);
+	std::vector<double> getSelfForce();
+	void addSelfForce(double val);
+	void setSelfForce(int index, double val);
 
 	bool getScheduled();
 	void setScheduled(bool s);

@@ -72,6 +72,17 @@ void node::setProbability(float probability){
 	return;
 }
 
+std::vector<double> node::getSelfForce() {
+	return this->selfForce;
+}
+
+void node::addSelfForce(double val) {
+	this->selfForce.push_back(val);
+}
+
+void node::setSelfForce(int index, double val) {
+	this->selfForce.at(index) = val;
+}
 
 int node::getNodeNum(){
 	return nodeNum;

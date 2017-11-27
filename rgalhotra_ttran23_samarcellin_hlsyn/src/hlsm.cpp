@@ -229,6 +229,43 @@ bool FDS(int totalNodes, int latency, std::vector<node>* nodes){
 
 	//SELF FORCE
 	// sf = distribution@thisT(1-probability) + distribution@otherT1(0-probability) + distribution@otherT2(0 -probability) ...
+		// Initializing self forces
+		for (i = 0; i < totalNodes; i++){
+			for (time = 0; time < latency; time++) {
+				(*nodes).at(i).addSelfForce(0.0);
+			}
+
+			if ((*nodes).at(i).getOperation() == "+" || (*nodes).at(i).getOperation() == "-"){
+				
+				for (time = 0; time < latency; time++) {	// Cycling through each self force, 
+					double temp = 0.0;
+
+					for (int time2 = 0; time2 < addDist.size(); time2++) {	// Loop to do the increment
+						if (time2 <= (*nodes).at(i).getAlapTime() && time2 >= (*nodes).at(i).getAsapTime()) {	// Only do the ones within time
+							if (time2 == time) {
+								temp += addDist.at(time2) * (1 - ((*nodes).at(i).getProbability()));
+							}
+							else {
+								temp += addDist.at(time2) * (0 - ((*nodes).at(i).getProbability()));
+							}
+						}
+					}
+
+					(*nodes).at(i).setSelfForce(time, temp);
+				}
+
+			}
+			else if ((*nodes).at(i).getOperation() == "*"){  // Multiply self force
+				
+			}
+			else if ((*nodes).at(i).getOperation() == "/" || (*nodes).at(i).getOperation() == "%"){  // Div/Mod self force
+
+			}
+			else{  //logic self force
+				
+			}
+		}
+
 
 	//predecesor force
 	//sucessor force
