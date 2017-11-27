@@ -47,6 +47,17 @@ int fileRead(char* fileName, std::vector<variable>* variables, std::vector<node>
 			results.push_back(word);
 			word.clear();
 
+			// Temporary fix, can leave as permanent if it doesn't break anything else.
+			bool tempParse = false;
+			while (!tempParse) {
+				if (results[0] != "") {
+					tempParse = true;
+				}
+				else {
+					results.erase(results.begin());
+				}
+			}
+
 			// If a variable, adds line as a node
 			if ((results[0] == "input") || (results[0] == "output") || (results[0] == "variable")) { //get data types and variable names of inputs and outputs. Parse data for node
 				temp = results[1];
@@ -92,7 +103,7 @@ int fileRead(char* fileName, std::vector<variable>* variables, std::vector<node>
 			//end if-else
 			
 			// For everything else
-			else if (results[1] == "=") {
+			else if (results[1] == "=") { 
 
 				// Trim the \t from output var
 				results[0].erase(std::remove(results[0].begin(), results[0].end(), '\t'), results[0].end());
