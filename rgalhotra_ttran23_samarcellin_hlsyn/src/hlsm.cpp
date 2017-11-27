@@ -330,7 +330,14 @@ bool FDS(int totalNodes, int latency, std::vector<node>* nodes){
 			finished = true;
 		}
 	}
-
+	//debug check to see if values are accurate
+	for (i = 0; i < (*nodes).size(); i++) {
+		std::cout << (*nodes).at(i).getResult();
+		for (int j = 0; j < (*nodes).at(i).getSelfForce().size(); j++) {
+			std::cout << " " << (*nodes).at(i).getSelfForce().at(j);
+		}
+		std::cout << std::endl;
+	}
 
 	return true;
 }
