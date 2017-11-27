@@ -17,8 +17,7 @@ int fileRead(char* fileName, std::vector<variable>* variables, std::vector<node>
 	int input1, input2, input3, output;
 	int SIZE = 0;
 	bool SIGN = false;
-	bool ifFlag = false;
-	bool elseFlag = false;
+	int ifElseFlag = 0;
 
 	inFS.open(fileName);//open input file
 	if (!inFS.is_open()) { //check opened correctly
@@ -81,14 +80,14 @@ int fileRead(char* fileName, std::vector<variable>* variables, std::vector<node>
 					}
 				}
 			}
-			//end input, output, variables
+			// End input, output, variables
 
 			// For if-else conditional
-			else if (results[0] == "if"){
-				ifFlag = true;
+			else if (results[0] == "if" || results[0] == "else"){
+				ifElseFlag++;
 			}
-			else if(results[0] == "}"){
-				ifFlag = false;
+			else if(results[0] == "}" && ifElseFlag > 0){
+				ifElseFlag--;
 			}
 			//end if-else
 			
@@ -130,6 +129,15 @@ int fileRead(char* fileName, std::vector<variable>* variables, std::vector<node>
 						(*unscheduledNodes).at(input1).addNextNode(&((*unscheduledNodes).at(output))); //set NEXT edges
 						(*unscheduledNodes).at(input2).addNextNode(&((*unscheduledNodes).at(output)));
 						(*unscheduledNodes).at(input3).addNextNode(&((*unscheduledNodes).at(output)));
+
+						// Sets the if/else block, 0 if not in an if-else
+						if (ifElseFlag > 0) {
+							(*unscheduledNodes).at(output).setConditional(true);
+						}
+						else {
+							(*unscheduledNodes).at(output).setConditional(false);
+						}
+						(*unscheduledNodes).at(output).setIfElse(ifElseFlag);
 					}
 					else{
 						return EXIT_FAILURE;
@@ -156,6 +164,15 @@ int fileRead(char* fileName, std::vector<variable>* variables, std::vector<node>
 						(*unscheduledNodes).at(output).setDelay(findDelay((*unscheduledNodes).at(output).getOperation()));
 						(*unscheduledNodes).at(input1).addNextNode(&((*unscheduledNodes).at(output))); //set NEXT edges
 						(*unscheduledNodes).at(input2).addNextNode(&((*unscheduledNodes).at(output)));
+
+						// Sets the if/else block, 0 if not in an if-else
+						if (ifElseFlag > 0) {
+							(*unscheduledNodes).at(output).setConditional(true);
+						}
+						else {
+							(*unscheduledNodes).at(output).setConditional(false);
+						}
+						(*unscheduledNodes).at(output).setIfElse(ifElseFlag);
 					}
 					else{
 						return EXIT_FAILURE;

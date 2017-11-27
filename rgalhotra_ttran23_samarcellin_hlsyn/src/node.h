@@ -28,7 +28,7 @@ private:
 	char visited;
 	bool scheduled;
 	bool conditional;
-
+	int ifElseBlock;	
 
 public:
 	node();
@@ -49,15 +49,13 @@ public:
 	void setPrevNodes(std::vector<node*> previous);
 	std::vector<node*> getNextNodes();
 	void setNextNodes(std::vector<node*> next);
-	std::vector<node*> getNextIfNodes();
-	void setNextIfNodes(std::vector<node*> ifNext);
-	std::vector<node*> getNextElseNodes();
-	void setNextElseNodes(std::vector<node*> elseNext);
-	
+	std::vector<node*> getNextIfNodes();				// ?? What we gonna do
+	void setNextIfNodes(std::vector<node*> ifNext);		// ?? with these?
+	std::vector<node*> getNextElseNodes();				// ??
+	void setNextElseNodes(std::vector<node*> elseNext);	// ??
 	
 	char getVisited();
 	void setVisited(char visited);
-	
 	
 	int getNodeNum();
 	void setNodeNum(int num);
@@ -77,6 +75,8 @@ public:
 	void setScheduled(bool s);
 	bool getConditional();
 	void setConditional(bool c);
+	int getIfElse();
+	void setIfElse(int c);
 
 	void addPrevNode(node* temp);
 	void addNextNode(node* temp);

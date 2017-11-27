@@ -14,6 +14,7 @@ node::node(int nodeNum){
 	cyclesElapsed = -1;
 	scheduled = false;
 	conditional = false;
+	ifElseBlock = 0;
 }
 
 std::string node::getOperation(){
@@ -168,6 +169,15 @@ bool node::getConditional(){
 
 void node::setConditional(bool conditional){
 	this->conditional = conditional;
+	return;
+}
+
+int node::getIfElse(){
+	return this->ifElseBlock;
+}
+
+void node::setIfElse(int c){
+	this->ifElseBlock = c;
 	return;
 }
 
