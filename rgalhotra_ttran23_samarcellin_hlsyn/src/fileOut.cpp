@@ -212,7 +212,6 @@ bool generateVerilogFile(std::vector<variable> ioList, std::vector<state> states
 	// Does the last variable because all other variables end with ',' while last one ends with ');'
 	outFS << ioHeaderList.at(ioHeaderList.size() - 1).getName() << " );\n";
 	//std::cout << ioHeaderList.at(ioHeaderList.size() - 1).getName() << " );\n";
-	outFS.close();
 
 	// Generates the list of Input and Outputs
 	generateIO(ioList, outFileStr);
@@ -259,7 +258,7 @@ bool generateVerilogFile(std::vector<variable> ioList, std::vector<state> states
 	outFS << "end" << std::endl;
 
 	// Generate list of states
-	generateStates(states, outFileStr, ioList);
+	generateStates(states, &outFS, ioList);
 
 	//last state
 	outFS << "sFinal: begin" << std::endl;
@@ -278,32 +277,30 @@ bool generateVerilogFile(std::vector<variable> ioList, std::vector<state> states
 	return true;
 }
 
-void generateStates(std::vector<state> states, char* outFileStr, std::vector<variable> ioList) {
+void generateStates(std::vector<state> states, std::ofstream *outFS, std::vector<variable> ioList) {
 	int i = 0;
 	int j = 0;
-	std::ofstream outFS;
-	outFS.open(outFileStr);//open output file
-	if (!outFS.is_open()) { //check opened correctly
+	if (!(*outFS).is_open()) { //check opened correctly
 		std::cout << "Could not open output file." << std::endl;
 		exit(EXIT_FAILURE);
 	}
 	for (i = 0; (unsigned int)i < states.size(); i++) {
-		outFS << "s";
-		outFS << (i + 2);
-		outFS << ": begin" << std::endl;
+		(*outFS) << "s";
+		(*outFS) << (i + 2);
+		(*outFS) << ": begin" << std::endl;
 		for (j = 0; (unsigned int)j < states.at(i).getNodes().size(); j++) {
 			if (states.at(i).getNodes().at(j).getOperation() == "?")
-				outFS << generateMux(states.at(i).getNodes().at(j).getResult(), states.at(i).getNodes().at(j).getVar1(), states.at(i).getNodes().at(j).getVar2(), states.at(i).getNodes().at(j).getVar3(), (i + j), ioList) << std::endl;
+				(*outFS) << generateMux(states.at(i).getNodes().at(j).getResult(), states.at(i).getNodes().at(j).getVar1(), states.at(i).getNodes().at(j).getVar2(), states.at(i).getNodes().at(j).getVar3(), (i + j), ioList) << std::endl;
 			else
-				outFS << generateModule(states.at(i).getNodes().at(j).getResult(), states.at(i).getNodes().at(j).getVar1(), states.at(i).getNodes().at(j).getVar2(), states.at(i).getNodes().at(j).getOperation(), (i + j), ioList) << std::endl;
-			outFS << "state <= ";
+				(*outFS) << generateModule(states.at(i).getNodes().at(j).getResult(), states.at(i).getNodes().at(j).getVar1(), states.at(i).getNodes().at(j).getVar2(), states.at(i).getNodes().at(j).getOperation(), (i + j), ioList) << std::endl;
+			(*outFS) << "state <= ";
 			if ((unsigned int)i < states.size() - 1) {
-				outFS << "s" << (i + 3) << ";" << std::endl;
+				(*outFS) << "s" << (i + 3) << ";" << std::endl;
 			}
 			else {
-				outFS << "sFinal;" << std::endl;
+				(*outFS) << "sFinal;" << std::endl;
 			}
-			outFS << "end" << std::endl;
+			(*outFS) << "end" << std::endl;
 		}
 	}
 }

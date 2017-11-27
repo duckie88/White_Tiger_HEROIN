@@ -18,5 +18,5 @@ std::string generateModule(std::string result, std::string oper1, std::string op
 std::string generateMux(std::string result, std::string oper1, std::string oper2, std::string oper3, int num, std::vector<variable>ioList);
 std::string toString(int n);
 std::string toString(double n);
-void generateStates(std::vector<state> states, char* outFileStr, std::vector<variable> ioList);
+void generateStates(std::vector<state> states, std::ofstream *outFS, std::vector<variable> ioList);
 #endif // VERILOGOUTPUT_H
