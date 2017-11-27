@@ -1,6 +1,5 @@
 #include "hlsm.h"
 
-
 //Calculates the dependency and gets cycle times for each operation
 
 bool scheduleASAP(unsigned int latency, std::vector<node>* unscheduled, std::vector<std::vector<node>>* ASAP) {
@@ -55,27 +54,14 @@ bool scheduleASAP(unsigned int latency, std::vector<node>* unscheduled, std::vec
 							(*unscheduled).at(j).getNextNodes().at(k)->setCyclesElapsed(i + (*unscheduled).at(j).getDelay());
 						}
 					}
-					if ((*unscheduled).at(j).getConditional()) { //if stuff
-						temp = (*unscheduled).at(j).getNextIfNodes();
-						for (k = 0; k < (*unscheduled).at(j).getNextIfNodes().size(); ++k) {
-							if (i + (*unscheduled).at(j).getDelay() > temp.at(k)->getCyclesElapsed()) {
-								temp.at(k)->setCyclesElapsed(i + (*unscheduled).at(j).getDelay());
-							}
-						}
-
-						temp = (*unscheduled).at(j).getNextElseNodes(); //else stuff
-						for (k = 0; k < temp.size(); ++k) {
-							if (i + (*unscheduled).at(j).getDelay() > temp.at(k)->getCyclesElapsed()) {
-								temp.at(k)->setCyclesElapsed(i + (*unscheduled).at(j).getDelay());
-							}
-						}
+					if ((*unscheduled).at(j).getConditional()) { //if-else check
+						
 					}
 				}
 			}
 		}
 		i++;
 	}
-
 
 	// Checking if latency is enough
 	if ((*ASAP).size() > latency) {

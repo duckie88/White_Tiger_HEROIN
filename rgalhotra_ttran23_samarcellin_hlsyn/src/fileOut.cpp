@@ -183,15 +183,8 @@ std::string generateMux(std::string result, std::string oper1, std::string oper2
 bool generateVerilogFile(std::vector<variable> ioList, std::vector<state> states, char* outFileStr) {
 
 	std::ofstream outFS; // Open file to append/write to it.
-	//std::string moduleName = filename;
 	std::vector<variable> ioHeaderList;	// For having a smaller list of input/output for just the header module(___); part. Needed because main ioList will also include wire/regs
 	int i = 0;
-
-	//								// https://stackoverflow.com/questions/8520560/get-a-file-name-from-a-path
-	//moduleName = moduleName.substr(moduleName.find_last_of("/\\_") + 1); // finds last occurance of a /, \, or _ (for trimming path)
-	//moduleName = moduleName.substr(0, moduleName.find_last_of(".")); // takes substring up to last occurance of . (for trimming extensions)
-	//we don't need this this time since the module is always HLSM guys
-
 
 	outFS.open(outFileStr);//open output file
 	if (!outFS.is_open()) { //check opened correctly
@@ -202,7 +195,6 @@ bool generateVerilogFile(std::vector<variable> ioList, std::vector<state> states
 	// Header
 	outFS << "`timescale 1ns / 1ps" << std::endl;
 	outFS << "module HLSM"  << "(Clk, Rst, Start, Done, ";
-	//std::cout << "module " << moduleName << "( ";
 
 	// Putting all input/output variables into a secondary vector
 	for (int i = 0; (unsigned int)i < ioList.size(); i++) {

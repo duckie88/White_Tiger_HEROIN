@@ -5,6 +5,7 @@
 #include "node.h"
 #include "variable.h"
 #include "fileIn.h"
+#include "fileOut.h"
 #include "hlsm.h"
 
 int main(int argc, char* argv[]) {
