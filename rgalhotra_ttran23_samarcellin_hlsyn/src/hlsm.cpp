@@ -1,5 +1,5 @@
 #include "hlsm.h"
-
+#include <iomanip>
 //Calculates the dependency and gets cycle times for each operation
 
 bool scheduleASAP(unsigned int latency, std::vector<node>* unscheduled, std::vector<std::vector<node>>* ASAP) {
@@ -186,8 +186,8 @@ bool FDS(int totalNodes, int latency, std::vector<node>* nodes){
 	}
 
 	while(!finished){
-	//calculate probability dist
-		//1/(ALAP - ASAP + 1)
+		//calculate probability dist
+		// (ALAP - ASAP + 1)
 		for(i = 0; i < totalNodes; i++){
 			temp = (*nodes).at(i).getAlapTime() - (*nodes).at(i).getAsapTime() + 1;
 			(*nodes).at(i).setProbability(1.0/temp);
@@ -197,7 +197,7 @@ bool FDS(int totalNodes, int latency, std::vector<node>* nodes){
 			//std::cout << (*nodes).at(i).getProbability() << std::endl;
 		}
 
-	//calculate probability distributions
+		//calculate probability distributions
 		for(time = 0; time < latency; time++){
 			addDist.push_back(0);
 			divDist.push_back(0);
@@ -227,117 +227,93 @@ bool FDS(int totalNodes, int latency, std::vector<node>* nodes){
 			}
 		}
 
-	//SELF FORCE
-	// sf = distribution@thisT(1-probability) + distribution@otherT1(0-probability) + distribution@otherT2(0 -probability) ...
-		// Initializing self forces
+		// Self Force
+		std::vector<double> selfDist;
 		for (i = 0; i < totalNodes; i++){
+			// Initialize self-force
 			for (time = 0; time < latency; time++) {
 				(*nodes).at(i).addSelfForce(0.0);
 			}
 
+			// Select the dist based on the operation
 			if ((*nodes).at(i).getOperation() == "+" || (*nodes).at(i).getOperation() == "-"){
-				for (time = 0; time < latency; time++) {	// Cycling through each self force, 
-					double temp = 0.0;
-					bool tempCheck = false;
-					for (int time2 = 0; time2 < addDist.size(); time2++) {	// Loop to do the increment
-						if (time2 <= (*nodes).at(i).getAlapTime() && time2 >= (*nodes).at(i).getAsapTime()) {	// Only do the ones within time
-							if (time2 == time) {
-								temp += addDist.at(time2) * (1 - ((*nodes).at(i).getProbability()));
-								tempCheck = true;
-							}
-							else {
-								temp += addDist.at(time2) * (0 - ((*nodes).at(i).getProbability()));
-							}
+				selfDist = addDist;
+			}
+			else if ((*nodes).at(i).getOperation() == "*"){  
+				selfDist = mulDist;
+			}
+			else if ((*nodes).at(i).getOperation() == "/" || (*nodes).at(i).getOperation() == "%"){  
+				selfDist = divDist;
+			}
+			else{  
+				selfDist = logicDist;
+			}
+
+			// Calculate self-force
+			for (int time1 = 0; time1 < latency; time1++) {	// Cycling through each self force, 
+				double temp = 0.0;
+				bool tempCheck = false;
+				for (int time2 = 0; time2 < selfDist.size(); time2++) {	// Loop to do the increment
+					if (time2 <= (*nodes).at(i).getAlapTime() && time2 >= (*nodes).at(i).getAsapTime()) {	// Only do the ones within time
+						if (time2 == time1) {
+							temp += selfDist.at(time2) * (1 - ((*nodes).at(i).getProbability()));
+							tempCheck = true;
 						}
-						if (tempCheck) {	// Only add to self force if time matches
-							(*nodes).at(i).setSelfForce(time, temp);
+						else {
+							temp += selfDist.at(time2) * (0 - ((*nodes).at(i).getProbability()));
 						}
 					}
-				}
-			}
-			else if ((*nodes).at(i).getOperation() == "*"){  // Multiply self force
-				for (time = 0; time < latency; time++) {	// Cycling through each self force, 
-					double temp = 0.0;
-					bool tempCheck = false;
-					for (int time2 = 0; time2 < mulDist.size(); time2++) {	// Loop to do the increment
-						if (time2 <= (*nodes).at(i).getAlapTime() && time2 >= (*nodes).at(i).getAsapTime()) {	// Only do the ones within time
-							if (time2 == time) {
-								temp += mulDist.at(time2) * (1 - ((*nodes).at(i).getProbability()));
-								tempCheck = true;
-							}
-							else {
-								temp += mulDist.at(time2) * (0 - ((*nodes).at(i).getProbability()));
-							}
-						}
-						if (tempCheck) {	// Only add to self force if time matches
-							(*nodes).at(i).setSelfForce(time, temp);
-						}
-					}
-				}
-			}
-			else if ((*nodes).at(i).getOperation() == "/" || (*nodes).at(i).getOperation() == "%"){  // Div/Mod self force
-				for (time = 0; time < latency; time++) {	// Cycling through each self force, 
-					double temp = 0.0;
-					bool tempCheck = false;
-					for (int time2 = 0; time2 < divDist.size(); time2++) {	// Loop to do the increment
-						if (time2 <= (*nodes).at(i).getAlapTime() && time2 >= (*nodes).at(i).getAsapTime()) {	// Only do the ones within time
-							if (time2 == time) {
-								temp += divDist.at(time2) * (1 - ((*nodes).at(i).getProbability()));
-								tempCheck = true;
-							}
-							else {
-								temp += divDist.at(time2) * (0 - ((*nodes).at(i).getProbability()));
-							}
-						}
-						if (tempCheck) {	// Only add to self force if time matches
-							(*nodes).at(i).setSelfForce(time, temp);
-						}
-					}
-				}
-			}
-			else{  //logic self force
-				for (time = 0; time < latency; time++) {	// Cycling through each self force, 
-					double temp = 0.0;
-					bool tempCheck = false;
-					for (int time2 = 0; time2 < logicDist.size(); time2++) {	// Loop to do the increment
-						if (time2 <= (*nodes).at(i).getAlapTime() && time2 >= (*nodes).at(i).getAsapTime()) {	// Only do the ones within time
-							if (time2 == time) {
-								temp += logicDist.at(time2) * (1 - ((*nodes).at(i).getProbability()));
-								tempCheck = true;
-							}
-							else {
-								temp += logicDist.at(time2) * (0 - ((*nodes).at(i).getProbability()));
-							}
-						}
-						if (tempCheck) {	// Only add to self force if time matches
-							(*nodes).at(i).setSelfForce(time, temp);
-						}
+					if (tempCheck) {	// Only add to self force if time matches
+						(*nodes).at(i).setSelfForce(time1, temp);
 					}
 				}
 			}
 		}
 
+		// Predecessor Force
+		std::vector<double> prevDist;
+		for (i = 0; i < totalNodes; i++){
+			// Initializing predecessor forces
+			for (time = 0; time < latency; time++) {
+				(*nodes).at(i).addPredForce(0.0);
+			}
+			
+			// Select the dist based on the distribution
+			if ((*nodes).at(i).getOperation() == "+" || (*nodes).at(i).getOperation() == "-"){
+				prevDist = addDist;
+			}
+			else if ((*nodes).at(i).getOperation() == "*"){  
+				prevDist = mulDist;
+			}
+			else if ((*nodes).at(i).getOperation() == "/" || (*nodes).at(i).getOperation() == "%"){  
+				prevDist = divDist;
+			}
+			else{  
+				prevDist = logicDist;
+			}
 
-	//predecesor force
-	//sucessor force
-	//schedule least force
+			// Calculate Predecessor Force
+		}
+
+		//sucessor force
+		//schedule least force
+		for (i = 0; i < (*nodes).size(); i++) {
+			std::cout << (*nodes).at(i).getResult();
+			for (int j = 0; j < (*nodes).at(i).getSelfForce().size(); j++) {
+				std::cout << "\t" << std::setprecision(4) << std::fixed << (*nodes).at(i).getSelfForce().at(j);
+				
+			}
+			std::cout << std::endl;
+		}
+		scheduled++;
+		//update timeframe (asap and alap = same number) of scheduled node (or else future pred/succ foces will be off)
 		
-	scheduled++;
-	//update timeframe (asap and alap = same number) of scheduled node (or else future pred/succ foces will be off)
-		
-	//check exit condition (all nodes scheduled)
+		//check exit condition (all nodes scheduled)
 		if(scheduled == totalNodes){
 			finished = true;
 		}
 	}
-	//debug check to see if values are accurate
-	for (i = 0; i < (*nodes).size(); i++) {
-		std::cout << (*nodes).at(i).getResult();
-		for (int j = 0; j < (*nodes).at(i).getSelfForce().size(); j++) {
-			std::cout << " " << (*nodes).at(i).getSelfForce().at(j);
-		}
-		std::cout << std::endl;
-	}
+	
 
 	return true;
 }

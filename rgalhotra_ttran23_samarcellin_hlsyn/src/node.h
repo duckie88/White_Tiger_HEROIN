@@ -20,6 +20,8 @@ private:
 	std::vector<node*> nextIfNodes;
 	std::vector<node*> nextElseNodes;
 	std::vector<double> selfForce;
+	std::vector<double> predForce;
+	std::vector<double> succForce;
 	int nodeNum;
 	int delay;
 	int asapTime;
@@ -74,6 +76,13 @@ public:
 	std::vector<double> getSelfForce();
 	void addSelfForce(double val);
 	void setSelfForce(int index, double val);
+	std::vector<double> getPredForce();
+	void addPredForce(double val);
+	void setPredForce(int index, double val);
+	std::vector<double> getSuccForce();
+	void addSuccForce(double val);
+	void setSuccForce(int index, double val);
+
 
 	bool getScheduled();
 	void setScheduled(bool s);

@@ -84,6 +84,30 @@ void node::setSelfForce(int index, double val) {
 	this->selfForce.at(index) = val;
 }
 
+std::vector<double> node::getPredForce() {
+	return this->predForce;
+}
+
+void node::addPredForce(double val) {
+	this->predForce.push_back(val);
+}
+
+void node::setPredForce(int index, double val) {
+	this->predForce.at(index) = val;
+}
+
+std::vector<double> node::getSuccForce() {
+	return this->succForce;
+}
+
+void node::addSuccForce(double val) {
+	this->succForce.push_back(val);
+}
+
+void node::setSuccForce(int index, double val) {
+	this->succForce.at(index) = val;
+}
+
 int node::getNodeNum(){
 	return nodeNum;
 }
