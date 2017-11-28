@@ -253,7 +253,7 @@ bool FDS(int totalNodes, int latency, std::vector<node>* nodes){
 			for (int time1 = 0; time1 < latency; time1++) {	// Cycling through each self force, 
 				double temp = 0.0;
 				bool tempCheck = false;
-				for (int time2 = 0; time2 < selfDist.size(); time2++) {	// Loop to do the increment
+				for (int time2 = 0; (unsigned int)time2 < selfDist.size(); time2++) {	// Loop to do the increment
 					if (time2 <= (*nodes).at(i).getAlapTime() && time2 >= (*nodes).at(i).getAsapTime()) {	// Only do the ones within time
 						if (time2 == time1) {
 							temp += selfDist.at(time2) * (1 - ((*nodes).at(i).getProbability()));
@@ -297,9 +297,9 @@ bool FDS(int totalNodes, int latency, std::vector<node>* nodes){
 
 		//sucessor force
 		//schedule least force
-		for (i = 0; i < (*nodes).size(); i++) {
+		for (i = 0; (unsigned int)i < (*nodes).size(); i++) {
 			std::cout << (*nodes).at(i).getResult();
-			for (int j = 0; j < (*nodes).at(i).getSelfForce().size(); j++) {
+			for (int j = 0; (unsigned int)j < (*nodes).at(i).getSelfForce().size(); j++) {
 				std::cout << "\t" << std::setprecision(4) << std::fixed << (*nodes).at(i).getSelfForce().at(j);
 				
 			}
