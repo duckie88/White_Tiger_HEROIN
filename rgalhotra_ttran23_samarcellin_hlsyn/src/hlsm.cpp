@@ -319,31 +319,35 @@ bool FDS(int totalNodes, int latency, std::vector<node>* nodes){
 				for (j = (*nodes).at(i).getAsapTime(); j < (*nodes).at(i).getAlapTime(); j++) {
 					for (k = 0; (unsigned int)k < (*nodes).at(i).getNextNodes().size(); k++) {
 						temp = 0.0;
-						if (j < (*nodes).at(i).getNextNodes().at(k)->getAsapTime()) { //Does ALAP hit ASAP?
+						if (j < (*nodes).at(i).getNextNodes().at(k)->getAsapTime()) { //Does ALAP hit ASAP? <- gets hit everytime
 							temp += 0;
 						}
 						else {
 							for (x = 0; x < latency; x++) {
-								if ((*nodes).at(i).getOperation() == "+" || (*nodes).at(i).getOperation() == "-") {
-									nextDist = addDist;
-								}
-								else if ((*nodes).at(i).getOperation() == "*") {
-									nextDist = mulDist;
-								}
-								else if ((*nodes).at(i).getOperation() == "/" || (*nodes).at(i).getOperation() == "%") {
-									nextDist = divDist;
-								}
-								else {
-									nextDist = logicDist;
-								}
-								temp += nextDist.at(x) * (1 - (*nodes).at(i).getNextNodes().at(k)->getProbability());
-								for (int z = (*nodes).at(i).getNextNodes().at(k)->getAsapTime(); z <= (*nodes).at(i).getNextNodes().at(k)->getAlapTime(); z++) {
-									if (z > j && z != x) {
-										temp = temp + nextDist.at(z) * (0 - (*nodes).at(i).getNextNodes().at(k)->getProbability());
+								if (x >= (*nodes).at(i).getNextNodes().at(k)->getAsapTime() && x <= (*nodes).at(i).getNextNodes().at(k)->getAlapTime()) {
+									if (x > j) {
+										if ((*nodes).at(i).getOperation() == "+" || (*nodes).at(i).getOperation() == "-") {
+											nextDist = addDist;
+										}
+										else if ((*nodes).at(i).getOperation() == "*") {
+											nextDist = mulDist;
+										}
+										else if ((*nodes).at(i).getOperation() == "/" || (*nodes).at(i).getOperation() == "%") {
+											nextDist = divDist;
+										}
+										else {
+											nextDist = logicDist;
+										}
+										temp += nextDist.at(x) * (1 - (*nodes).at(i).getNextNodes().at(k)->getProbability());
+										for (int z = (*nodes).at(i).getNextNodes().at(k)->getAsapTime(); z <= (*nodes).at(i).getNextNodes().at(k)->getAlapTime(); z++) {
+											if ((z > j) & (z != x)) {
+												temp = temp + nextDist.at(z) * (0 - (*nodes).at(i).getNextNodes().at(k)->getProbability());
+											}
+										}
 									}
 								}
 							}
-						}
+						}		
 						(*nodes).at(i).setSuccForce(j, (*nodes).at(i).getSuccForce().at(j) + temp);  //THIS IS THE LINE THAT USED TO BREAK IT ROHIN - YOU FORGOT TO CREATE THE SPACE IN THE VECTOR
 					}
 					for (k = 0; (unsigned int)k < (*nodes).at(i).getNextIfNodes().size(); k++) {
@@ -352,28 +356,32 @@ bool FDS(int totalNodes, int latency, std::vector<node>* nodes){
 							temp += 0;
 						}
 						else {
-							for (x = 0;x < latency; x++) {
-								if ((*nodes).at(i).getOperation() == "+" || (*nodes).at(i).getOperation() == "-") {
-									nextDist = addDist;
-								}
-								else if ((*nodes).at(i).getOperation() == "*") {
-									nextDist = mulDist;
-								}
-								else if ((*nodes).at(i).getOperation() == "/" || (*nodes).at(i).getOperation() == "%") {
-									nextDist = divDist;
-								}
-								else {
-									nextDist = logicDist;
-								}
-								temp += nextDist.at(x) * (1 - (*nodes).at(i).getNextIfNodes().at(k)->getProbability());
-								for (int z = (*nodes).at(i).getNextIfNodes().at(k)->getAsapTime(); z <= (*nodes).at(i).getNextIfNodes().at(k)->getAlapTime(); z++) {
-									if (z > j && x != z) {
-										temp = temp + nextDist.at(z) * (0 - (*nodes).at(i).getNextIfNodes().at(k)->getProbability());
+							for (x = 0; x < latency; x++) {
+								if (x >= (*nodes).at(i).getNextIfNodes().at(k)->getAsapTime() && x <= (*nodes).at(i).getNextIfNodes().at(k)->getAlapTime()) {
+									if (x > j) {
+										if ((*nodes).at(i).getOperation() == "+" || (*nodes).at(i).getOperation() == "-") {
+											nextDist = addDist;
+										}
+										else if ((*nodes).at(i).getOperation() == "*") {
+											nextDist = mulDist;
+										}
+										else if ((*nodes).at(i).getOperation() == "/" || (*nodes).at(i).getOperation() == "%") {
+											nextDist = divDist;
+										}
+										else {
+											nextDist = logicDist;
+										}
+										temp += nextDist.at(x) * (1 - (*nodes).at(i).getNextIfNodes().at(k)->getProbability());
+										for (int z = (*nodes).at(i).getNextIfNodes().at(k)->getAsapTime(); z <= (*nodes).at(i).getNextIfNodes().at(k)->getAlapTime(); z++) {
+											if ((z > j) & (z != x)) {
+												temp = temp + nextDist.at(z) * (0 - (*nodes).at(i).getNextIfNodes().at(k)->getProbability());
+											}
+										}
 									}
 								}
 							}
 						}
-						(*nodes).at(i).setSuccForce(j, (*nodes).at(i).getSuccForce().at(j) + temp);
+						(*nodes).at(i).setSuccForce(j, (*nodes).at(i).getSuccForce().at(j) + temp);  //THIS IS THE LINE THAT USED TO BREAK IT ROHIN - YOU FORGOT TO CREATE THE SPACE IN THE VECTOR
 					}
 				}
 			}
