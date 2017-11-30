@@ -323,24 +323,24 @@ bool FDS(int totalNodes, int latency, std::vector<node>* nodes){
 							temp += 0;
 						}
 						else {
-							if ((*nodes).at(i).getOperation() == "+" || (*nodes).at(i).getOperation() == "-") {
-								nextDist = addDist;
-							}
-							else if ((*nodes).at(i).getOperation() == "*") {
-								nextDist = mulDist;
-							}
-							else if ((*nodes).at(i).getOperation() == "/" || (*nodes).at(i).getOperation() == "%") {
-								nextDist = divDist;
-							}
-							else {
-								nextDist = logicDist;
-							}
 							for (x = 0; x < nextDist.size(); x++) {
+								if ((*nodes).at(i).getOperation() == "+" || (*nodes).at(i).getOperation() == "-") {
+									nextDist = addDist;
+								}
+								else if ((*nodes).at(i).getOperation() == "*") {
+									nextDist = mulDist;
+								}
+								else if ((*nodes).at(i).getOperation() == "/" || (*nodes).at(i).getOperation() == "%") {
+									nextDist = divDist;
+								}
+								else {
+									nextDist = logicDist;
+								}
 								temp += nextDist.at(x) * (1 - (*nodes).at(i).getNextNodes().at(k)->getProbability());
-							}
-							for (unsigned int z = (*nodes).at(i).getNextNodes().at(k)->getAsapTime(); z <= (*nodes).at(i).getNextNodes().at(k)->getAlapTime(); z++) {
-								if (z > j) {
-									temp = temp + nextDist.at(z) * (0 - (*nodes).at(i).getNextNodes().at(k)->getProbability());
+								for (unsigned int z = (*nodes).at(i).getNextNodes().at(k)->getAsapTime(); z <= (*nodes).at(i).getNextNodes().at(k)->getAlapTime(); z++) {
+									if (z > j) {
+										temp = temp + nextDist.at(z) * (0 - (*nodes).at(i).getNextNodes().at(k)->getProbability());
+									}
 								}
 							}
 						}
@@ -352,24 +352,24 @@ bool FDS(int totalNodes, int latency, std::vector<node>* nodes){
 							temp += 0;
 						}
 						else {
-							if ((*nodes).at(i).getOperation() == "+" || (*nodes).at(i).getOperation() == "-") {
-								nextDist = addDist;
-							}
-							else if ((*nodes).at(i).getOperation() == "*") {
-								nextDist = mulDist;
-							}
-							else if ((*nodes).at(i).getOperation() == "/" || (*nodes).at(i).getOperation() == "%") {
-								nextDist = divDist;
-							}
-							else {
-								nextDist = logicDist;
-							}
 							for (x = 0; x < nextDist.size(); x++) {
+								if ((*nodes).at(i).getOperation() == "+" || (*nodes).at(i).getOperation() == "-") {
+									nextDist = addDist;
+								}
+								else if ((*nodes).at(i).getOperation() == "*") {
+									nextDist = mulDist;
+								}
+								else if ((*nodes).at(i).getOperation() == "/" || (*nodes).at(i).getOperation() == "%") {
+									nextDist = divDist;
+								}
+								else {
+									nextDist = logicDist;
+								}
 								temp += nextDist.at(x) * (1 - (*nodes).at(i).getNextIfNodes().at(k)->getProbability());
-							}
-							for (unsigned int z = (*nodes).at(i).getNextIfNodes().at(k)->getAsapTime(); z <= (*nodes).at(i).getNextIfNodes().at(k)->getAlapTime(); z++) {
-								if (z > j) {
-									temp = temp + nextDist.at(z) * (0 - (*nodes).at(i).getNextIfNodes().at(k)->getProbability());
+								for (unsigned int z = (*nodes).at(i).getNextIfNodes().at(k)->getAsapTime(); z <= (*nodes).at(i).getNextIfNodes().at(k)->getAlapTime(); z++) {
+									if (z > j) {
+										temp = temp + nextDist.at(z) * (0 - (*nodes).at(i).getNextIfNodes().at(k)->getProbability());
+									}
 								}
 							}
 						}
