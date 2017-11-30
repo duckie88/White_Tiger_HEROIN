@@ -232,7 +232,7 @@ bool FDS(int totalNodes, int latency, std::vector<node>* nodes){
 		for (i = 0; i < totalNodes; i++){
 			// Initialize self-force
 			for (time = 0; time < latency; time++) {
-				(*nodes).at(i).addSelfForce(0.0);
+				(*nodes).at(i).addSelfForce(10000.0);
 			}
 
 			// Select the dist based on the operation
@@ -250,7 +250,7 @@ bool FDS(int totalNodes, int latency, std::vector<node>* nodes){
 			}
 
 			// Calculate self-force
-			for (int time1 = 0; time1 < latency; time1++) {	// Cycling through each self force, 
+			for (int time1 = (*nodes).at(i).getAsapTime(); time1 <= (*nodes).at(i).getAlapTime() && time1 < latency; time1++) {	// Cycling through each self force, 
 				double temp = 0.0;
 				bool tempCheck = false;
 				for (int time2 = 0; (unsigned int)time2 < selfDist.size(); time2++) {	// Loop to do the increment
@@ -275,7 +275,7 @@ bool FDS(int totalNodes, int latency, std::vector<node>* nodes){
 		for (i = 0; i < totalNodes; i++){
 			// Initializing predecessor forces
 			for (time = 0; time < latency; time++) {
-				(*nodes).at(i).addPredForce(0.0);
+				(*nodes).at(i).addPredForce(0.0);	// This can be 0.
 			}
 			
 			// Select the dist based on the distribution
@@ -300,7 +300,7 @@ bool FDS(int totalNodes, int latency, std::vector<node>* nodes){
 		for (i = 0; (unsigned int)i < (*nodes).size(); i++) {
 			std::cout << (*nodes).at(i).getResult();
 			for (int j = 0; (unsigned int)j < (*nodes).at(i).getSelfForce().size(); j++) {
-				std::cout << "\t" << std::setprecision(4) << std::fixed << (*nodes).at(i).getSelfForce().at(j);
+				std::cout << "\t" << std::setprecision(6) << std::fixed << (*nodes).at(i).getSelfForce().at(j);
 				
 			}
 			std::cout << std::endl;
