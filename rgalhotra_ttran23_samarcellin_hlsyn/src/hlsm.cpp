@@ -318,27 +318,27 @@ bool FDS(int totalNodes, int latency, std::vector<node>* nodes){
 			if ((*nodes).at(i).getNextNodes().size() > 0) {
 				for (j = (*nodes).at(i).getAsapTime(); j < (*nodes).at(i).getAlapTime(); j++) {
 					for (k = 0; (unsigned int)k < (*nodes).at(i).getNextNodes().size(); k++) {
-						temp = 0;
-						if (j < (*nodes).at(i).getNextNodes().at(k)->getAsapTime()) {
+						temp = 0.0;
+						if (j < (*nodes).at(i).getNextNodes().at(k)->getAsapTime()) { //Does ALAP hit ASAP? <- gets hit everytime
 							temp += 0;
 						}
 						else {
+							if ((*nodes).at(i).getOperation() == "+" || (*nodes).at(i).getOperation() == "-") {
+								nextDist = addDist;
+							}
+							else if ((*nodes).at(i).getOperation() == "*") {
+								nextDist = mulDist;
+							}
+							else if ((*nodes).at(i).getOperation() == "/" || (*nodes).at(i).getOperation() == "%") {
+								nextDist = divDist;
+							}
+							else {
+								nextDist = logicDist;
+							}
 							for (x = 0; (unsigned int)x < nextDist.size(); x++) {
-								if ((*nodes).at(i).getOperation() == "+" || (*nodes).at(i).getOperation() == "-") {
-									nextDist = addDist;
-								}
-								else if ((*nodes).at(i).getOperation() == "*") {
-									nextDist = mulDist;
-								}
-								else if ((*nodes).at(i).getOperation() == "/" || (*nodes).at(i).getOperation() == "%") {
-									nextDist = divDist;
-								}
-								else {
-									nextDist = logicDist;
-								}
 								temp += nextDist.at(x) * (1 - (*nodes).at(i).getNextNodes().at(k)->getProbability());
 								for (int z = (*nodes).at(i).getNextNodes().at(k)->getAsapTime(); z <= (*nodes).at(i).getNextNodes().at(k)->getAlapTime(); z++) {
-									if (z > j) {
+									if ((z > j) & (z != x)) {
 										temp = temp + nextDist.at(z) * (0 - (*nodes).at(i).getNextNodes().at(k)->getProbability());
 									}
 								}
@@ -367,7 +367,7 @@ bool FDS(int totalNodes, int latency, std::vector<node>* nodes){
 								}
 								temp += nextDist.at(x) * (1 - (*nodes).at(i).getNextIfNodes().at(k)->getProbability());
 								for (int z = (*nodes).at(i).getNextIfNodes().at(k)->getAsapTime(); z <= (*nodes).at(i).getNextIfNodes().at(k)->getAlapTime(); z++) {
-									if (z > j) {
+									if ((z > j) & (z != x)) {
 										temp = temp + nextDist.at(z) * (0 - (*nodes).at(i).getNextIfNodes().at(k)->getProbability());
 									}
 								}
