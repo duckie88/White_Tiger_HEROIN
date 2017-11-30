@@ -275,7 +275,7 @@ bool FDS(int totalNodes, int latency, std::vector<node>* nodes){
 			}
 
 			if((*nodes).at(i).getPrevNodes().size() != 0){ //if previous forces exist
-				for(j = 0; j < (*nodes).at(i).getPrevNodes().size(); j++){ //find times each previous incoming node could have been scheduled at
+				for(j = 0; (unsigned int)j < (*nodes).at(i).getPrevNodes().size(); j++){ //find times each previous incoming node could have been scheduled at
 					// Select the dist based on the distribution
 					if ((*nodes).at(i).getPrevNodes().at(j)->getOperation() == "+" || (*nodes).at(i).getPrevNodes().at(j)->getOperation() == "-"){
 						prevDist = addDist;
@@ -293,7 +293,7 @@ bool FDS(int totalNodes, int latency, std::vector<node>* nodes){
 					//THIS PART DOESN'T WORK
 					for(k = (*nodes).at(i).getPrevNodes().at(j)->getAsapTime(); k <= (*nodes).at(i).getPrevNodes().at(j)->getAlapTime(); k++){
 						temp = 0.0;
-						for(time2 = 0; time2 < prevDist.size(); time2++){
+						for(time2 = 0; (unsigned int)time2 < prevDist.size(); time2++){
 							if (time2 <= (*nodes).at(i).getPrevNodes().at(j)->getAlapTime() && time2 >= (*nodes).at(i).getPrevNodes().at(j)->getAsapTime()) {	// Only do the ones within time
 								if (k == time2) {
 									temp += prevDist.at(time2) * (1 - ((*nodes).at(i).getPrevNodes().at(j)->getProbability()));
@@ -316,14 +316,14 @@ bool FDS(int totalNodes, int latency, std::vector<node>* nodes){
 				(*nodes).at(i).addSuccForce(0.0);	// This can be 0.
 			}
 			if ((*nodes).at(i).getNextNodes().size() > 0) {
-				for (j = (*nodes).at(i).getAsapTime(); (unsigned int)j < (*nodes).at(i).getAlapTime(); j++) {
+				for (j = (*nodes).at(i).getAsapTime(); j < (*nodes).at(i).getAlapTime(); j++) {
 					for (k = 0; (unsigned int)k < (*nodes).at(i).getNextNodes().size(); k++) {
 						temp = 0;
 						if (j < (*nodes).at(i).getNextNodes().at(k)->getAsapTime()) {
 							temp += 0;
 						}
 						else {
-							for (x = 0; x < nextDist.size(); x++) {
+							for (x = 0; (unsigned int)x < nextDist.size(); x++) {
 								if ((*nodes).at(i).getOperation() == "+" || (*nodes).at(i).getOperation() == "-") {
 									nextDist = addDist;
 								}
@@ -337,7 +337,7 @@ bool FDS(int totalNodes, int latency, std::vector<node>* nodes){
 									nextDist = logicDist;
 								}
 								temp += nextDist.at(x) * (1 - (*nodes).at(i).getNextNodes().at(k)->getProbability());
-								for (unsigned int z = (*nodes).at(i).getNextNodes().at(k)->getAsapTime(); z <= (*nodes).at(i).getNextNodes().at(k)->getAlapTime(); z++) {
+								for (int z = (*nodes).at(i).getNextNodes().at(k)->getAsapTime(); z <= (*nodes).at(i).getNextNodes().at(k)->getAlapTime(); z++) {
 									if (z > j) {
 										temp = temp + nextDist.at(z) * (0 - (*nodes).at(i).getNextNodes().at(k)->getProbability());
 									}
@@ -352,7 +352,7 @@ bool FDS(int totalNodes, int latency, std::vector<node>* nodes){
 							temp += 0;
 						}
 						else {
-							for (x = 0; x < nextDist.size(); x++) {
+							for (x = 0; (unsigned int)x < nextDist.size(); x++) {
 								if ((*nodes).at(i).getOperation() == "+" || (*nodes).at(i).getOperation() == "-") {
 									nextDist = addDist;
 								}
@@ -366,7 +366,7 @@ bool FDS(int totalNodes, int latency, std::vector<node>* nodes){
 									nextDist = logicDist;
 								}
 								temp += nextDist.at(x) * (1 - (*nodes).at(i).getNextIfNodes().at(k)->getProbability());
-								for (unsigned int z = (*nodes).at(i).getNextIfNodes().at(k)->getAsapTime(); z <= (*nodes).at(i).getNextIfNodes().at(k)->getAlapTime(); z++) {
+								for (int z = (*nodes).at(i).getNextIfNodes().at(k)->getAsapTime(); z <= (*nodes).at(i).getNextIfNodes().at(k)->getAlapTime(); z++) {
 									if (z > j) {
 										temp = temp + nextDist.at(z) * (0 - (*nodes).at(i).getNextIfNodes().at(k)->getProbability());
 									}
@@ -378,9 +378,9 @@ bool FDS(int totalNodes, int latency, std::vector<node>* nodes){
 				}
 			}
 		}
-		for (i = 0; i < (*nodes).size(); i++) {
+		for (i = 0; (unsigned int)i < (*nodes).size(); i++) {
 			std::cout << (*nodes).at(i).getResult() << " ";
-			for (j = 0; j < (*nodes).at(i).getSuccForce().size(); j++) {
+			for (j = 0; (unsigned int)j < (*nodes).at(i).getSuccForce().size(); j++) {
 				std::cout << (*nodes).at(i).getSuccForce().at(j) << " ";
 			}
 			std::cout << std::endl;
