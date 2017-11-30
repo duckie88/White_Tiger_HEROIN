@@ -1,5 +1,6 @@
 #include "hlsm.h"
 #include <iomanip>
+#include <iostream>
 //Calculates the dependency and gets cycle times for each operation
 
 bool scheduleASAP(unsigned int latency, std::vector<node>* unscheduled, std::vector<std::vector<node>>* ASAP) {
@@ -170,7 +171,7 @@ bool scheduleALAP(unsigned int latency, std::vector<node>* unscheduled, std::vec
 
 bool FDS(int totalNodes, int latency, std::vector<node>* nodes){
 	int scheduled = 0;
-	int i, temp, time;
+	int i, j, k, temp, time, time1, time2, x;
 	std::vector<double> mulDist;
 	std::vector<double> divDist;
 	std::vector<double> addDist;
@@ -227,7 +228,7 @@ bool FDS(int totalNodes, int latency, std::vector<node>* nodes){
 			}
 		}
 
-		// Self Force
+		// Self Force  WORKING
 		std::vector<double> selfDist;
 		for (i = 0; i < totalNodes; i++){
 			// Initialize self-force
@@ -248,64 +249,145 @@ bool FDS(int totalNodes, int latency, std::vector<node>* nodes){
 			else{  
 				selfDist = logicDist;
 			}
-
-			// Calculate self-force
-			for (int time1 = (*nodes).at(i).getAsapTime(); time1 <= (*nodes).at(i).getAlapTime() && time1 < latency; time1++) {	// Cycling through each self force, 
+			for (time1 = (*nodes).at(i).getAsapTime(); time1 <= (*nodes).at(i).getAlapTime(); time1++) {	// Cycling through each self force, 
 				double temp = 0.0;
-				bool tempCheck = false;
-				for (int time2 = 0; (unsigned int)time2 < selfDist.size(); time2++) {	// Loop to do the increment
+				for (time2 = 0; (unsigned int)time2 < selfDist.size(); time2++) {	// Loop to do the increment
 					if (time2 <= (*nodes).at(i).getAlapTime() && time2 >= (*nodes).at(i).getAsapTime()) {	// Only do the ones within time
 						if (time2 == time1) {
 							temp += selfDist.at(time2) * (1 - ((*nodes).at(i).getProbability()));
-							tempCheck = true;
 						}
 						else {
 							temp += selfDist.at(time2) * (0 - ((*nodes).at(i).getProbability()));
 						}
-					}
-					if (tempCheck) {	// Only add to self force if time matches
 						(*nodes).at(i).setSelfForce(time1, temp);
 					}
 				}
 			}
 		}
 
-		// Predecessor Force
+		// Predecessor Force  NOT WORKING
 		std::vector<double> prevDist;
 		for (i = 0; i < totalNodes; i++){
 			// Initializing predecessor forces
 			for (time = 0; time < latency; time++) {
 				(*nodes).at(i).addPredForce(0.0);	// This can be 0.
 			}
-			
-			// Select the dist based on the distribution
-			if ((*nodes).at(i).getOperation() == "+" || (*nodes).at(i).getOperation() == "-"){
-				prevDist = addDist;
-			}
-			else if ((*nodes).at(i).getOperation() == "*"){  
-				prevDist = mulDist;
-			}
-			else if ((*nodes).at(i).getOperation() == "/" || (*nodes).at(i).getOperation() == "%"){  
-				prevDist = divDist;
-			}
-			else{  
-				prevDist = logicDist;
-			}
 
-			// Calculate Predecessor Force
+			if((*nodes).at(i).getPrevNodes().size() != 0){ //if previous forces exist
+				for(j = 0; j < (*nodes).at(i).getPrevNodes().size(); j++){ //find times each previous incoming node could have been scheduled at
+					// Select the dist based on the distribution
+					if ((*nodes).at(i).getPrevNodes().at(j)->getOperation() == "+" || (*nodes).at(i).getPrevNodes().at(j)->getOperation() == "-"){
+						prevDist = addDist;
+					}
+					else if ((*nodes).at(i).getPrevNodes().at(j)->getOperation() == "*"){  
+						prevDist = mulDist;
+					}
+					else if ((*nodes).at(i).getPrevNodes().at(j)->getOperation() == "/" || (*nodes).at(i).getPrevNodes().at(j)->getOperation() == "%"){  
+						prevDist = divDist;
+					}
+					else{  
+						prevDist = logicDist;
+					}
+
+					//THIS PART DOESN'T WORK
+					for(k = (*nodes).at(i).getPrevNodes().at(j)->getAsapTime(); k <= (*nodes).at(i).getPrevNodes().at(j)->getAlapTime(); k++){
+						temp = 0.0;
+						for(time2 = 0; time2 < prevDist.size(); time2++){
+							if (time2 <= (*nodes).at(i).getPrevNodes().at(j)->getAlapTime() && time2 >= (*nodes).at(i).getPrevNodes().at(j)->getAsapTime()) {	// Only do the ones within time
+								if (k == time2) {
+									temp += prevDist.at(time2) * (1 - ((*nodes).at(i).getPrevNodes().at(j)->getProbability()));
+								}
+								else {
+									temp += prevDist.at(time2) * (0 - ((*nodes).at(i).getPrevNodes().at(j)->getProbability()));
+								}
+								(*nodes).at(i).setPredForce(k,temp);
+							}
+						}
+					}
+				}
+			}
 		}
 
-		//sucessor force
-		//schedule least force
+		//sucessor force   NOT WORKING
+		std::vector<double> nextDist;
 		for (i = 0; (unsigned int)i < (*nodes).size(); i++) {
-			std::cout << (*nodes).at(i).getResult();
-			for (int j = 0; (unsigned int)j < (*nodes).at(i).getSelfForce().size(); j++) {
-				std::cout << "\t" << std::setprecision(6) << std::fixed << (*nodes).at(i).getSelfForce().at(j);
-				
+			for (time = 0; time < latency; time++) {  //THIS FIXES YOUR SEG FAULT
+				(*nodes).at(i).addSuccForce(0.0);	// This can be 0.
+			}
+			if ((*nodes).at(i).getNextNodes().size() > 0) {
+				for (j = (*nodes).at(i).getAsapTime(); (unsigned int)j < (*nodes).at(i).getAlapTime(); j++) {
+					for (k = 0; (unsigned int)k < (*nodes).at(i).getNextNodes().size(); k++) {
+						temp = 0;
+						if (j < (*nodes).at(i).getNextNodes().at(k)->getAsapTime()) {
+							temp += 0;
+						}
+						else {
+							if ((*nodes).at(i).getOperation() == "+" || (*nodes).at(i).getOperation() == "-") {
+								nextDist = addDist;
+							}
+							else if ((*nodes).at(i).getOperation() == "*") {
+								nextDist = mulDist;
+							}
+							else if ((*nodes).at(i).getOperation() == "/" || (*nodes).at(i).getOperation() == "%") {
+								nextDist = divDist;
+							}
+							else {
+								nextDist = logicDist;
+							}
+							for (x = 0; x < nextDist.size(); x++) {
+								temp += nextDist.at(x) * (1 - (*nodes).at(i).getNextNodes().at(k)->getProbability());
+							}
+							for (unsigned int z = (*nodes).at(i).getNextNodes().at(k)->getAsapTime(); z <= (*nodes).at(i).getNextNodes().at(k)->getAlapTime(); z++) {
+								if (z > j) {
+									temp = temp + nextDist.at(z) * (0 - (*nodes).at(i).getNextNodes().at(k)->getProbability());
+								}
+							}
+						}
+						(*nodes).at(i).setSuccForce(j, (*nodes).at(i).getSuccForce().at(j) + temp);  //THIS IS THE LINE THAT USED TO BREAK IT ROHIN - YOU FORGOT TO CREATE THE SPACE IN THE VECTOR
+					}
+					for (k = 0; (unsigned int)k < (*nodes).at(i).getNextIfNodes().size(); k++) {
+						temp = 0;
+						if (j < (*nodes).at(i).getNextIfNodes().at(k)->getAsapTime()) {
+							temp += 0;
+						}
+						else {
+							if ((*nodes).at(i).getOperation() == "+" || (*nodes).at(i).getOperation() == "-") {
+								nextDist = addDist;
+							}
+							else if ((*nodes).at(i).getOperation() == "*") {
+								nextDist = mulDist;
+							}
+							else if ((*nodes).at(i).getOperation() == "/" || (*nodes).at(i).getOperation() == "%") {
+								nextDist = divDist;
+							}
+							else {
+								nextDist = logicDist;
+							}
+							for (x = 0; x < nextDist.size(); x++) {
+								temp += nextDist.at(x) * (1 - (*nodes).at(i).getNextIfNodes().at(k)->getProbability());
+							}
+							for (unsigned int z = (*nodes).at(i).getNextIfNodes().at(k)->getAsapTime(); z <= (*nodes).at(i).getNextIfNodes().at(k)->getAlapTime(); z++) {
+								if (z > j) {
+									temp = temp + nextDist.at(z) * (0 - (*nodes).at(i).getNextIfNodes().at(k)->getProbability());
+								}
+							}
+						}
+						(*nodes).at(i).setSuccForce(j, (*nodes).at(i).getSuccForce().at(j) + temp);
+					}
+				}
+			}
+		}
+		for (i = 0; i < (*nodes).size(); i++) {
+			std::cout << (*nodes).at(i).getResult() << " ";
+			for (j = 0; j < (*nodes).at(i).getSuccForce().size(); j++) {
+				std::cout << (*nodes).at(i).getSuccForce().at(j) << " ";
 			}
 			std::cout << std::endl;
-		}
+}
+
+		//schedule least force
 		scheduled++;
+
 		//update timeframe (asap and alap = same number) of scheduled node (or else future pred/succ foces will be off)
 		
 		//check exit condition (all nodes scheduled)
