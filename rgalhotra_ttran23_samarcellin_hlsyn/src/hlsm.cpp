@@ -170,7 +170,7 @@ bool scheduleALAP(unsigned int latency, std::vector<node>* unscheduled, std::vec
 
 bool FDS(int totalNodes, int latency, std::vector<node>* nodes){
 	int scheduled = 0;
-	int i, temp, time;
+	int i, temp, time, j, k, x;
 	std::vector<double> mulDist;
 	std::vector<double> divDist;
 	std::vector<double> addDist;
@@ -295,7 +295,79 @@ bool FDS(int totalNodes, int latency, std::vector<node>* nodes){
 			// Calculate Predecessor Force
 		}
 
-		//sucessor force
+		//Successor Force
+		std::vector<double> nextDist;
+		for (i = 0; (unsigned int)i < (*nodes).size(); i++) {
+			if ((*nodes).at(i).getNextNodes().size() > 0) {
+				for (j = (*nodes).at(i).getAsapTime(); (unsigned int)j < (*nodes).at(i).getAlapTime(); j++) {
+					for (k = 0; (unsigned int)k < (*nodes).at(i).getNextNodes().size(); k++) {
+						temp = 0;
+						if (j < (*nodes).at(i).getNextNodes().at(k)->getAsapTime()) {
+							temp += 0;
+						}
+						else {
+							if (x >= (*nodes).at(i).getNextNodes().at(k)->getAsapTime() && x <= (*nodes).at(i).getNextNodes().at(k)->getAlapTime()) {
+								if (x > j) {
+									if ((*nodes).at(i).getOperation() == "+" || (*nodes).at(i).getOperation() == "-") {
+										nextDist = addDist;
+									}
+									else if ((*nodes).at(i).getOperation() == "*") {
+										nextDist = mulDist;
+									}
+									else if ((*nodes).at(i).getOperation() == "/" || (*nodes).at(i).getOperation() == "%") {
+										nextDist = divDist;
+									}
+									else {
+										nextDist = logicDist;
+									}
+									temp += nextDist.at(x) * (1 - (*nodes).at(i).getNextNodes().at(k)->getProbability());
+									for (unsigned int z = (*nodes).at(i).getNextNodes().at(k)->getAsapTime(); z <= (*nodes).at(i).getNextNodes().at(k)->getAlapTime(); z++) {
+										if (z > j && z != x) {
+											temp = temp + nextDist.at(z) * (0 - (*nodes).at(i).getNextNodes().at(k)->getProbability());
+										}
+									}
+								}
+							}
+						}
+						(*nodes).at(i).setSuccForce(j, (*nodes).at(i).getSuccForce().at(j) + temp);
+					}
+					for (k = 0; (unsigned int)k < (*nodes).at(i).getNextIfNodes().size(); k++) {
+						temp = 0;
+						if (j < (*nodes).at(i).getNextNodes().at(k)->getAsapTime()) {
+							temp += 0;
+						}
+						else {
+							if (x >= (*nodes).at(i).getNextNodes().at(k)->getAsapTime() && x <= (*nodes).at(i).getNextNodes().at(k)->getAlapTime()) {
+								if (x > j) {
+									if ((*nodes).at(i).getOperation() == "+" || (*nodes).at(i).getOperation() == "-") {
+										nextDist = addDist;
+									}
+									else if ((*nodes).at(i).getOperation() == "*") {
+										nextDist = mulDist;
+									}
+									else if ((*nodes).at(i).getOperation() == "/" || (*nodes).at(i).getOperation() == "%") {
+										nextDist = divDist;
+									}
+									else {
+										nextDist = logicDist;
+									}
+									temp += nextDist.at(x) * (1 - (*nodes).at(i).getNextNodes().at(k)->getProbability());
+									for (unsigned int z = (*nodes).at(i).getNextNodes().at(k)->getAsapTime(); z <= (*nodes).at(i).getNextNodes().at(k)->getAlapTime(); z++) {
+										if (z > j && z != x) {
+											temp = temp + nextDist.at(z) * (0 - (*nodes).at(i).getNextNodes().at(k)->getProbability());
+										}
+									}
+								}
+							}
+						}
+						(*nodes).at(i).setSuccForce(j, (*nodes).at(i).getSuccForce().at(j) + temp);
+					}
+				}
+			}
+		}
+
+
+
 		//schedule least force
 		for (i = 0; (unsigned int)i < (*nodes).size(); i++) {
 			std::cout << (*nodes).at(i).getResult();
