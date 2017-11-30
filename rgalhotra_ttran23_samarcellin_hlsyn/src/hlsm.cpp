@@ -326,13 +326,13 @@ bool FDS(int totalNodes, int latency, std::vector<node>* nodes){
 							for (x = 0; x < latency; x++) {
 								if (x >= (*nodes).at(i).getNextNodes().at(k)->getAsapTime() && x <= (*nodes).at(i).getNextNodes().at(k)->getAlapTime()) {
 									if (x > j) {
-										if ((*nodes).at(i).getOperation() == "+" || (*nodes).at(i).getOperation() == "-") {
+										if ((*nodes).at(i).getNextNodes().at(k)->getOperation() == "+" || (*nodes).at(i).getNextNodes().at(k)->getOperation() == "-") {
 											nextDist = addDist;
 										}
-										else if ((*nodes).at(i).getOperation() == "*") {
+										else if ((*nodes).at(i).getNextNodes().at(k)->getOperation() == "*") {
 											nextDist = mulDist;
 										}
-										else if ((*nodes).at(i).getOperation() == "/" || (*nodes).at(i).getOperation() == "%") {
+										else if ((*nodes).at(i).getNextNodes().at(k)->getOperation() == "/" || (*nodes).at(i).getNextNodes().at(k)->getOperation() == "%") {
 											nextDist = divDist;
 										}
 										else {
