@@ -7,6 +7,6 @@
 
 Project reads in C-like files and uses the provided latency to create a force-directed graph scheduled HLSM.
 
-Rohin: 
-Stephanie: 
-Tam: 
+Rohin: parsing (handle duplicate entries) output file, asap/alap (scrapped), states, succ force
+Stephanie: parsing (IO/operations), asap/alap (version we went with), probability distribution, pred force (modified version)[add as you want]
+Tam: parsing (operations), asap/alap (scrapped), self force, pred force (early version)
