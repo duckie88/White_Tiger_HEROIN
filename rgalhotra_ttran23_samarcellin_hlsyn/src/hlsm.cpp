@@ -171,7 +171,8 @@ bool scheduleALAP(unsigned int latency, std::vector<node>* unscheduled, std::vec
 
 bool FDS(int totalNodes, int latency, std::vector<node>* nodes){
 	int scheduled = 0;
-	int i, j, k, temp, time, time1, time2, x;
+	int i, j, k, time, time1, time2, x;
+	double temp;
 	std::vector<double> mulDist;
 	std::vector<double> divDist;
 	std::vector<double> addDist;
