@@ -323,7 +323,7 @@ bool FDS(int totalNodes, int latency, std::vector<node>* nodes){
 							temp += 0;
 						}
 						else {
-							for (x = 0; (unsigned int)x < nextDist.size(); x++) {
+							for (x = 0; x < latency; x++) {
 								if ((*nodes).at(i).getOperation() == "+" || (*nodes).at(i).getOperation() == "-") {
 									nextDist = addDist;
 								}
@@ -338,7 +338,7 @@ bool FDS(int totalNodes, int latency, std::vector<node>* nodes){
 								}
 								temp += nextDist.at(x) * (1 - (*nodes).at(i).getNextNodes().at(k)->getProbability());
 								for (int z = (*nodes).at(i).getNextNodes().at(k)->getAsapTime(); z <= (*nodes).at(i).getNextNodes().at(k)->getAlapTime(); z++) {
-									if (z > j) {
+									if (z > j && z != x) {
 										temp = temp + nextDist.at(z) * (0 - (*nodes).at(i).getNextNodes().at(k)->getProbability());
 									}
 								}
@@ -352,7 +352,7 @@ bool FDS(int totalNodes, int latency, std::vector<node>* nodes){
 							temp += 0;
 						}
 						else {
-							for (x = 0; (unsigned int)x < nextDist.size(); x++) {
+							for (x = 0;x < latency; x++) {
 								if ((*nodes).at(i).getOperation() == "+" || (*nodes).at(i).getOperation() == "-") {
 									nextDist = addDist;
 								}
@@ -367,7 +367,7 @@ bool FDS(int totalNodes, int latency, std::vector<node>* nodes){
 								}
 								temp += nextDist.at(x) * (1 - (*nodes).at(i).getNextIfNodes().at(k)->getProbability());
 								for (int z = (*nodes).at(i).getNextIfNodes().at(k)->getAsapTime(); z <= (*nodes).at(i).getNextIfNodes().at(k)->getAlapTime(); z++) {
-									if (z > j) {
+									if (z > j && x != z) {
 										temp = temp + nextDist.at(z) * (0 - (*nodes).at(i).getNextIfNodes().at(k)->getProbability());
 									}
 								}
