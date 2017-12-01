@@ -291,7 +291,8 @@ void generateStates(std::vector<state> states, std::ofstream *outFS, std::vector
 		for (j = 0; (unsigned int)j < states.at(i).getNodes().size(); j++) {
 			
 			if (states.at(i).getNodes().at(j).getOperation() == "?")
-				(*outFS) << generateMux(states.at(i).getNodes().at(j).getResult(), states.at(i).getNodes().at(j).getVar1(), states.at(i).getNodes().at(j).getVar2(), states.at(i).getNodes().at(j).getVar3(), (i + j), ioList) << std::endl;
+				(*outFS) << "if (" << states.at(i).getNodes().at(j).getVar3() << " ==  0)" << std::endl  << "\t" << states.at(i).getNodes().at(j).getResult() << " <= " << states.at(i).getNodes().at(j).getVar1() << ";" << std::endl << "else" << std::endl << "\t" << states.at(i).getNodes().at(j).getResult() << " <= " << states.at(i).getNodes().at(j).getVar2() << ";" << std::endl;
+				//(*outFS) << generateMux(states.at(i).getNodes().at(j).getResult(), states.at(i).getNodes().at(j).getVar1(), states.at(i).getNodes().at(j).getVar2(), states.at(i).getNodes().at(j).getVar3(), (i + j), ioList) << std::endl;
 			else
 				(*outFS) << states.at(i).getNodes().at(j).getResult() << " <= " << states.at(i).getNodes().at(j).getVar1() << " " << states.at(i).getNodes().at(j).getOperation() << " " << states.at(i).getNodes().at(j).getVar2() << ";" << std::endl;
 				//(*outFS) << generateModule(states.at(i).getNodes().at(j).getResult(), states.at(i).getNodes().at(j).getVar1(), states.at(i).getNodes().at(j).getVar2(), states.at(i).getNodes().at(j).getOperation(), (i + j), ioList) << std::endl;
