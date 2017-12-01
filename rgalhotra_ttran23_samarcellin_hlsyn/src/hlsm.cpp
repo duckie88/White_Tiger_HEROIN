@@ -169,6 +169,9 @@ bool scheduleALAP(unsigned int latency, std::vector<node>* unscheduled, std::vec
 	return true; //shouldn't we check for if all unscheduled nodes have true scheduled? // ANSWER: that is what the for loop with the return false does
 }
 
+
+// Performs Force Directed Scheduling
+
 bool FDS(int totalNodes, int latency, std::vector<node>* nodes,  std::vector<std::vector<node>>* FDS){
 	int scheduled = 0;
 	int i, j, k, m, time, time1, time2, x, min;
@@ -185,11 +188,17 @@ bool FDS(int totalNodes, int latency, std::vector<node>* nodes,  std::vector<std
 			(*nodes).at(i).setScheduled(true);
 			scheduled++;
 		}
+
+		// Initialize self-force, pred-force, succ-force, total-force
+		for (time = 0; time < latency; time++) {
+			(*nodes).at(i).addSelfForce(10000.0);
+			(*nodes).at(i).addPredForce(0.0);
+			(*nodes).at(i).addSuccForce(0.0);
+			(*nodes).at(i).addTotalForce(0.0);
+		}
 	}
 
 	while(!finished){
-		min = 10000;
-
 		//calculate probability dist
 		// (ALAP - ASAP + 1)
 		for(i = 0; i < totalNodes; i++){
@@ -234,11 +243,6 @@ bool FDS(int totalNodes, int latency, std::vector<node>* nodes,  std::vector<std
 		// Self Force  WORKING
 		std::vector<double> selfDist;
 		for (i = 0; i < totalNodes; i++){
-			// Initialize self-force
-			for (time = 0; time < latency; time++) {
-				(*nodes).at(i).addSelfForce(10000.0);
-			}
-
 			// Select the dist based on the operation
 			if ((*nodes).at(i).getOperation() == "+" || (*nodes).at(i).getOperation() == "-"){
 				selfDist = addDist;
@@ -282,11 +286,6 @@ bool FDS(int totalNodes, int latency, std::vector<node>* nodes,  std::vector<std
 		// Predecessor Force  works for everything but mux (z) Heeeeelp
 		std::vector<double> prevDist;
 		for (i = 0; i < totalNodes; i++){
-			// Initializing predecessor forces
-			for (time = 0; time < latency; time++) {
-				(*nodes).at(i).addPredForce(0.0);	// This can be 0.
-			}
-
 			if((*nodes).at(i).getPrevNodes().size() != 0){ //if previous forces exist
 				for(j = 0; (unsigned int)j < (*nodes).at(i).getPrevNodes().size(); j++){ //for each previous node
 					//i is current node
@@ -310,11 +309,6 @@ bool FDS(int totalNodes, int latency, std::vector<node>* nodes,  std::vector<std
 		
 		// Stephanie's broken as fuck Successor Force - noooope
 		for (i = 0; i < totalNodes; i++){
-			// Initializing successor forces
-			for (time = 0; time < latency; time++) {
-				(*nodes).at(i).addSuccForce(0.0);	// This can be 0.
-			}
-
 			if ((*nodes).at(i).getNextNodes().size() != 0){ //if successor forces exist
 				for (j = 0; (unsigned int)j < (*nodes).at(i).getNextNodes().size(); j++){ //for each existing next node
 					//i is current node
@@ -361,7 +355,7 @@ bool FDS(int totalNodes, int latency, std::vector<node>* nodes,  std::vector<std
 		*/
 
 		/*
-		//Rohin's Janky Successor Force
+		//Tam's Janky Successor Force
 		std::vector<double> nextDist;
 		for (i = 0; i < totalNodes; i++){
 			// Initializing successor forces
@@ -404,6 +398,7 @@ bool FDS(int totalNodes, int latency, std::vector<node>* nodes,  std::vector<std
 			}
 		}
 		*/
+		//Rohin's Janky Successor Force
 		/*for (i = 0; (unsigned int)i < (*nodes).size(); i++) {
 			for (time = 0; time < latency; time++) {  //THIS FIXES YOUR SEG FAULT
 				(*nodes).at(i).addSuccForce(0.0);	// This can be 0.
@@ -481,11 +476,12 @@ bool FDS(int totalNodes, int latency, std::vector<node>* nodes,  std::vector<std
 		}*/
 
 		//total force
+		min = 50000;	// Moved reset of min here bc readability
 		for(i = 0; i < totalNodes; i++){
 			if((*nodes).at(i).getScheduled() == false){
 				for(j = 0; j < latency; j++){
 					temp = (*nodes).at(i).getSelfForce().at(j) + (*nodes).at(i).getSuccForce().at(j) + (*nodes).at(i).getPredForce().at(j);
-					(*nodes).at(i).addTotalForce(temp);
+					(*nodes).at(i).setTotalForce(j, temp);
 					if(temp < min){
 						min = temp;
 						k = i;  //k is index of node
