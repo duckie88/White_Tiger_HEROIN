@@ -275,6 +275,9 @@ bool FDS(int totalNodes, int latency, std::vector<node>* nodes,  std::vector<std
 
 		// Predecessor Force 
 		std::vector<double> prevDist;
+		for (i = 0; i < latency; i++) {
+			(*nodes).at(i).addPredForce(0.0);
+		}
 		for (i = 0; i < totalNodes; i++){
 			if((*nodes).at(i).getPrevNodes().size() != 0){ //if previous forces exist
 				for(j = 0; (unsigned int)j < (*nodes).at(i).getPrevNodes().size(); j++){ //for each previous node
@@ -287,7 +290,7 @@ bool FDS(int totalNodes, int latency, std::vector<node>* nodes,  std::vector<std
 							if (((*nodes).at(i).getResult() == "g" && (*nodes).at(i).getPrevNodes().at(j)->getResult() == "dLTe") || ((*nodes).at(i).getResult() == "z" && (*nodes).at(i).getPrevNodes().at(j)->getResult() == "g")) {
 								//SECRET DEFEAT CODE DON'T LET EPA KNOW
 								prevDist = (*nodes).at(i).getPrevNodes().at(j)->getSelfForce();
-								for (x = 0; x < prevDist.size(); x++) {
+								for (x = 0; (unsigned int)x < prevDist.size(); x++) {
 									(*nodes).at(i).setPredForce(prevDist.at(i), x);
 								}
 								goto cocaine;

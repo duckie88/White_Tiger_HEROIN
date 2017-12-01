@@ -88,7 +88,7 @@ int fileRead(char* fileName, std::vector<variable>* variables, std::vector<node>
 			else if (results[0] == "if"  || results[0] == "else" || results[0] == "\tif" || results[0] == "\telse"){
 				ifElseFlag++;
 			}
-			else if(results[0] == "}" || results[0] == "\t}" && ifElseFlag > 0){
+			else if((results[0] == "}" || results[0] == "\t}") && ifElseFlag > 0){
 				ifElseFlag--;
 			}
 			else if(results[0] == "\t"){
