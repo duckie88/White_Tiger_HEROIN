@@ -47,17 +47,6 @@ int fileRead(char* fileName, std::vector<variable>* variables, std::vector<node>
 			results.push_back(word);
 			word.clear();
 
-			// Temporary fix, can leave as permanent if it doesn't break anything else.
-			bool tempParse = false;
-			while (!tempParse) {
-				if (results[0] != "") {
-					tempParse = true;
-				}
-				else {
-					results.erase(results.begin());
-				}
-			}
-
 			// If a variable, adds line as a node
 			if ((results[0] == "input") || (results[0] == "output") || (results[0] == "variable")) { //get data types and variable names of inputs and outputs. Parse data for node
 				temp = results[1];
@@ -94,11 +83,14 @@ int fileRead(char* fileName, std::vector<variable>* variables, std::vector<node>
 			// End input, output, variables
 
 			// For if-else conditional
-			else if (results[0] == "if" || results[0] == "else"){
+			else if (results[0] == "if"  || results[0] == "else" || results[0] == "\tif" || results[0] == "\telse"){
 				ifElseFlag++;
 			}
-			else if(results[0] == "}" && ifElseFlag > 0){
+			else if(results[0] == "}" || results[0] == "\t}" && ifElseFlag > 0){
 				ifElseFlag--;
+			}
+			else if(results[0] == "\t"){
+				//to prevent trying to read the blank indented lines as commands
 			}
 			//end if-else
 			
