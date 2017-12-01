@@ -272,18 +272,8 @@ bool FDS(int totalNodes, int latency, std::vector<node>* nodes,  std::vector<std
 			}
 		}
 
-		std::cout << "Self Forces:" << std::endl;
-		for(i = 0; i < totalNodes; i++){
-			std::cout << (*nodes).at(i).getResult() << " : ";
-			for(j = 0; j < latency; j++){
-				std::cout << (*nodes).at(i).getSelfForce().at(j) << " ";
-			}
-			std::cout << std::endl;
-		}
 
-
-
-		// Predecessor Force  works for everything but mux (z) Heeeeelp
+		// Predecessor Force 
 		std::vector<double> prevDist;
 		for (i = 0; i < totalNodes; i++){
 			if((*nodes).at(i).getPrevNodes().size() != 0){ //if previous forces exist
@@ -314,7 +304,15 @@ bool FDS(int totalNodes, int latency, std::vector<node>* nodes,  std::vector<std
 			}
 		}
 
-
+		/*
+		std::cout << "Predecessor Forces:" << std::endl;
+		for(i = 0; i < totalNodes; i++){
+			std::cout << (*nodes).at(i).getResult() << " : ";
+			for(j = 0; j < latency; j++){
+				std::cout << (*nodes).at(i).getPredForce().at(j) << " ";
+			}
+			std::cout << std::endl;
+		}*/
 		
 		// Stephanie's broken as fuck Successor Force - noooope
 		for (i = 0; i < totalNodes; i++){
@@ -323,12 +321,15 @@ bool FDS(int totalNodes, int latency, std::vector<node>* nodes,  std::vector<std
 					//i is current node
 					//j is next node
 					//k is time frame of curent node
-					//time2 is time frame of next node
+					//m is time frame of next node
 					for (k = (*nodes).at(i).getAsapTime(); k <= (*nodes).at(i).getAlapTime(); k++){
-						for (time2 = (*nodes).at(i).getNextNodes().at(j)->getAsapTime(); time2 < (*nodes).at(i).getNextNodes().at(j)->getAlapTime(); time2++){
-							if (time2 > k && (*nodes).at(i).getNextNodes().at(j)->getAsapTime() <= (*nodes).at(i).getAlapTime()) {
+						if(k == -1){
+							break;
+						}
+						for (m = (*nodes).at(i).getNextNodes().at(j)->getAsapTime(); m <= (*nodes).at(i).getNextNodes().at(j)->getAlapTime(); m++){
+							if (m > k) {
 								temp = (*nodes).at(i).getSuccForce().at(k);
-								temp += (*nodes).at(i).getNextNodes().at(j)->getSelfForce().at(time2);
+								temp += (*nodes).at(i).getNextNodes().at(j)->getSelfForce().at(m);
 								(*nodes).at(i).setSuccForce(k, temp);
 							}
 						}
@@ -337,32 +338,18 @@ bool FDS(int totalNodes, int latency, std::vector<node>* nodes,  std::vector<std
 			}
 		}
 		
-		/* Steph's other, jankier code. is weird. (needs distributions changed if work resumes, was just trying to figure out mux)
-		temp = 0;
-		for(int total = 0; total < totalNodes; total++){
-			if((*nodes).at(total).getPrevNodes().size() != 0){ //do we even have any predecessor forces?
-				for(i = (*nodes).at(total).getAsapTime(); i <= (*nodes).at(total).getAlapTime(); i++){
-					for(j = 0; j < (*nodes).at(total).getPrevNodes().size(); j++){ //go through all previous nodes
-						temp = 0;
-						if(i <= (*nodes).at(total).getPrevNodes().at(j)->getAlapTime()){ //does this node actually effect placement (alap encroaches past asap)
-							for(k = 0; k < latency; k++){
-								if(k >= (*nodes).at(total).getPrevNodes().at(j)->getAsapTime() && k <= (*nodes).at(total).getPrevNodes().at(j)->getAlapTime()){ //inside time frame
-									temp = temp + muxDist.at(k)*(1 - (*nodes).at(total).getPrevNodes().at(j)->getProbability());
-									for(m = (*nodes).at(total).getPrevNodes().at(j)->getAsapTime(); m <= (*nodes).at(total).getPrevNodes().at(j)->getAlapTime(); m++){
-										if(m != k && m > i){
-											temp = temp + muxDist.at(m)*(0 - (*nodes).at(total).getPrevNodes().at(j)->getProbability());
-										}
-									}
-								}
-							}
-						}
-					}
-				}
+		/*
+		std::cout << "Successor Forces:" << std::endl;
+		for(i = 0; i < totalNodes; i++){
+			std::cout << (*nodes).at(i).getResult() << " : ";
+			for(j = 0; j < latency; j++){
+				std::cout << (*nodes).at(i).getSuccForce().at(j) << " ";
 			}
-			(*nodes).at(total).addSuccForce(temp); //here.... I think.
+			std::cout << std::endl;
 		}
 		*/
-
+		
+		
 		/*
 		//Tam's Janky Successor Force
 		std::vector<double> nextDist;
@@ -407,82 +394,6 @@ bool FDS(int totalNodes, int latency, std::vector<node>* nodes,  std::vector<std
 			}
 		}
 		*/
-		//Rohin's Janky Successor Force
-		/*for (i = 0; (unsigned int)i < (*nodes).size(); i++) {
-			for (time = 0; time < latency; time++) {  //THIS FIXES YOUR SEG FAULT
-				(*nodes).at(i).addSuccForce(0.0);	// This can be 0.
-			}
-			if ((*nodes).at(i).getNextNodes().size() > 0) {
-				for (j = (*nodes).at(i).getAsapTime(); j < (*nodes).at(i).getAlapTime(); j++) {
-					for (k = 0; (unsigned int)k < (*nodes).at(i).getNextNodes().size(); k++) {
-						temp = 0.0;
-						if (j < (*nodes).at(i).getNextNodes().at(k)->getAsapTime()) { //Does ALAP hit ASAP? <- gets hit everytime
-							temp += 0.0;
-						}
-						else {
-							for (x = 0; x < latency; x++) {
-								if (x >= (*nodes).at(i).getNextNodes().at(k)->getAsapTime() && x <= (*nodes).at(i).getNextNodes().at(k)->getAlapTime()) {
-									if (x > j) {
-										if ((*nodes).at(i).getNextNodes().at(k)->getOperation() == "+" || (*nodes).at(i).getNextNodes().at(k)->getOperation() == "-") {
-											nextDist = addDist;
-										}
-										else if ((*nodes).at(i).getNextNodes().at(k)->getOperation() == "*") {
-											nextDist = mulDist;
-										}
-										else if ((*nodes).at(i).getNextNodes().at(k)->getOperation() == "/" || (*nodes).at(i).getNextNodes().at(k)->getOperation() == "%") {
-											nextDist = divDist;
-										}
-										else {
-											nextDist = logicDist;
-										}
-										temp += nextDist.at(x) * (1 - (*nodes).at(i).getNextNodes().at(k)->getProbability());
-										for (int z = (*nodes).at(i).getNextNodes().at(k)->getAsapTime(); z <= (*nodes).at(i).getNextNodes().at(k)->getAlapTime(); z++) {
-											if ((z > j) & (z != x)) {
-												temp = temp + nextDist.at(z) * (0 - (*nodes).at(i).getNextNodes().at(k)->getProbability());
-											}
-										}
-									}
-								}
-							}
-						}		
-						(*nodes).at(i).setSuccForce(j, (*nodes).at(i).getSuccForce().at(j) + temp);  //THIS IS THE LINE THAT USED TO BREAK IT ROHIN - YOU FORGOT TO CREATE THE SPACE IN THE VECTOR
-					}
-					for (k = 0; (unsigned int)k < (*nodes).at(i).getNextIfNodes().size(); k++) {
-						temp = 0;
-						if (j < (*nodes).at(i).getNextIfNodes().at(k)->getAsapTime()) {
-							temp += 0;
-						}
-						else {
-							for (x = 0; x < latency; x++) {
-								if (x >= (*nodes).at(i).getNextIfNodes().at(k)->getAsapTime() && x <= (*nodes).at(i).getNextIfNodes().at(k)->getAlapTime()) {
-									if (x > j) {
-										if ((*nodes).at(i).getOperation() == "+" || (*nodes).at(i).getOperation() == "-") {
-											nextDist = addDist;
-										}
-										else if ((*nodes).at(i).getOperation() == "*") {
-											nextDist = mulDist;
-										}
-										else if ((*nodes).at(i).getOperation() == "/" || (*nodes).at(i).getOperation() == "%") {
-											nextDist = divDist;
-										}
-										else {
-											nextDist = logicDist;
-										}
-										temp += nextDist.at(x) * (1 - (*nodes).at(i).getNextIfNodes().at(k)->getProbability());
-										for (int z = (*nodes).at(i).getNextIfNodes().at(k)->getAsapTime(); z <= (*nodes).at(i).getNextIfNodes().at(k)->getAlapTime(); z++) {
-											if ((z > j) & (z != x)) {
-												temp = temp + nextDist.at(z) * (0 - (*nodes).at(i).getNextIfNodes().at(k)->getProbability());
-											}
-										}
-									}
-								}
-							}
-						}
-						(*nodes).at(i).setSuccForce(j, (*nodes).at(i).getSuccForce().at(j) + temp);  //THIS IS THE LINE THAT USED TO BREAK IT ROHIN - YOU FORGOT TO CREATE THE SPACE IN THE VECTOR
-					}
-				}
-			}
-		}*/
 
 		//total force
 		min = 50000;	// Moved reset of min here bc readability

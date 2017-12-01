@@ -9,7 +9,7 @@
 #include "hlsm.h"
 
 int main(int argc, char* argv[]) {
-	int i, j;
+	int i;
 	std::vector<variable> unscheduledIO;
 	std::vector<node> unscheduledNodes;
 	std::vector<state> states;
@@ -58,14 +58,15 @@ int main(int argc, char* argv[]) {
 		return EXIT_FAILURE;
 	}
 
-
+	/*
 	for(i = 0; (unsigned int)i < scheduledFDS.size(); i++){
 		std::cout << "time = " << i << ":\t";
-		for(j = 0; (unsigned int)j < scheduledFDS.at(i).size(); j++){
+		for(int j = 0; (unsigned int)j < scheduledFDS.at(i).size(); j++){
 			std::cout << scheduledFDS.at(i).at(j).getResult() << "\t";
 		}
 		std::cout << std::endl;
 	}
+	*/
 
 	//output verilog
 	if (!generateVerilogFile(unscheduledIO, createStates(scheduledFDS), argv[3])) { 
