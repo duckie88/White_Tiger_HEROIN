@@ -108,6 +108,18 @@ void node::setSuccForce(int index, double val) {
 	this->succForce.at(index) = val;
 }
 
+std::vector<double> node::getTotalForce() {
+	return this->totalForce;
+}
+
+void node::addTotalForce(double val) {
+	this->totalForce.push_back(val);
+}
+
+void node::setTotalForce(int index, double val) {
+	this->totalForce.at(index) = val;
+}
+
 int node::getNodeNum(){
 	return nodeNum;
 }

@@ -9,11 +9,11 @@
 #include "hlsm.h"
 
 int main(int argc, char* argv[]) {
-	int i;
+	int i, j;
 	std::vector<variable> unscheduledIO;
 	std::vector<node> unscheduledNodes;
 	std::vector<state> states;
-	std::vector<std::vector<node>> scheduledASAP, scheduledALAP;
+	std::vector<std::vector<node>> scheduledASAP, scheduledALAP, scheduledFDS;
 	
 
 	if (argc != 4) {  //check for correct function call
@@ -47,14 +47,28 @@ int main(int argc, char* argv[]) {
 		unscheduledNodes.at(i).setScheduled(false);
 	}
 
+	//set up FDS
+	for(i = 0; i < std::stoi(argv[2]); i++){
+		scheduledFDS.push_back(std::vector<node>());
+	}
+
 	//do FDS   FINALLY
-	if (!FDS(unscheduledNodes.size(),std::stoi(argv[2]), &unscheduledNodes)){
+	if (!FDS(unscheduledNodes.size(),std::stoi(argv[2]), &unscheduledNodes, &scheduledFDS)){
 		std::cout << "FDS Error.\n";
 		return EXIT_FAILURE;
 	}
 
+
+	for(i = 0; i < scheduledFDS.size(); i++){
+		std::cout << "time = " << i << ":\t";
+		for(j = 0; j < scheduledFDS.at(i).size(); j++){
+			std::cout << scheduledFDS.at(i).at(j).getResult() << "\t";
+		}
+		std::cout << std::endl;
+	}
+
 	//output verilog
-	if (!generateVerilogFile(unscheduledIO, createStates(scheduledASAP), argv[3])) { //wrong arg for createStates, but FDS output not created yet
+	if (!generateVerilogFile(unscheduledIO, createStates(scheduledFDS), argv[3])) { 
 		std::cout << "Output Error.\n";
 		return EXIT_FAILURE;
 	}

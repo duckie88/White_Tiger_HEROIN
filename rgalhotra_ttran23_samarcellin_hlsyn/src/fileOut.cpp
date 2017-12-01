@@ -237,10 +237,10 @@ bool generateVerilogFile(std::vector<variable> ioList, std::vector<state> states
 	for (i = 0; (unsigned int)i < ioList.size(); i++) {
 		outFS << ioList.at(i).getName() << " <= 0;" << std::endl;
 	}
-	for (i = 0; (unsigned int)i < ioList.size(); i++) {
-		if(ioList.at(i).getType() == "output")
-			outFS << ioList.at(i).getName() << " <= 0;" << std::endl;
-	}
+	//for (i = 0; (unsigned int)i < ioList.size(); i++) {
+	//	if(ioList.at(i).getType() == "output")
+	//		outFS << ioList.at(i).getName() << " <= 0;" << std::endl;
+	//}
 	outFS << "Done <= 0;" << std::endl;
 	outFS << "end" << std::endl;
 
@@ -289,11 +289,14 @@ void generateStates(std::vector<state> states, std::ofstream *outFS, std::vector
 		(*outFS) << (i + 2);
 		(*outFS) << ": begin" << std::endl;
 		for (j = 0; (unsigned int)j < states.at(i).getNodes().size(); j++) {
+			
 			if (states.at(i).getNodes().at(j).getOperation() == "?")
 				(*outFS) << generateMux(states.at(i).getNodes().at(j).getResult(), states.at(i).getNodes().at(j).getVar1(), states.at(i).getNodes().at(j).getVar2(), states.at(i).getNodes().at(j).getVar3(), (i + j), ioList) << std::endl;
 			else
-				(*outFS) << generateModule(states.at(i).getNodes().at(j).getResult(), states.at(i).getNodes().at(j).getVar1(), states.at(i).getNodes().at(j).getVar2(), states.at(i).getNodes().at(j).getOperation(), (i + j), ioList) << std::endl;
+				(*outFS) << states.at(i).getNodes().at(j).getResult() << " <= " << states.at(i).getNodes().at(j).getVar1() << " " << states.at(i).getNodes().at(j).getOperation() << " " << states.at(i).getNodes().at(j).getVar2() << ";" << std::endl;
+				//(*outFS) << generateModule(states.at(i).getNodes().at(j).getResult(), states.at(i).getNodes().at(j).getVar1(), states.at(i).getNodes().at(j).getVar2(), states.at(i).getNodes().at(j).getOperation(), (i + j), ioList) << std::endl;
 			(*outFS) << "state <= ";
+			
 			if ((unsigned int)i < states.size() - 1) {
 				(*outFS) << "s" << (i + 3) << ";" << std::endl;
 			}

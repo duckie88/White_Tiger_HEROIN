@@ -22,6 +22,7 @@ private:
 	std::vector<double> selfForce;
 	std::vector<double> predForce;
 	std::vector<double> succForce;
+	std::vector<double> totalForce;
 	int nodeNum;
 	int delay;
 	int asapTime;
@@ -82,7 +83,9 @@ public:
 	std::vector<double> getSuccForce();
 	void addSuccForce(double val);
 	void setSuccForce(int index, double val);
-
+	std::vector<double> getTotalForce();
+	void addTotalForce(double val);
+	void setTotalForce(int index, double val);
 
 	bool getScheduled();
 	void setScheduled(bool s);

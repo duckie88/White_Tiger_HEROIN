@@ -169,9 +169,9 @@ bool scheduleALAP(unsigned int latency, std::vector<node>* unscheduled, std::vec
 	return true; //shouldn't we check for if all unscheduled nodes have true scheduled? // ANSWER: that is what the for loop with the return false does
 }
 
-bool FDS(int totalNodes, int latency, std::vector<node>* nodes){
+bool FDS(int totalNodes, int latency, std::vector<node>* nodes,  std::vector<std::vector<node>>* FDS){
 	int scheduled = 0;
-	int i, j, k, time, time1, time2, x;
+	int i, j, k, m, time, time1, time2, x, min;
 	double temp;
 	std::vector<double> mulDist;
 	std::vector<double> divDist;
@@ -188,6 +188,8 @@ bool FDS(int totalNodes, int latency, std::vector<node>* nodes){
 	}
 
 	while(!finished){
+		min = 10000;
+
 		//calculate probability dist
 		// (ALAP - ASAP + 1)
 		for(i = 0; i < totalNodes; i++){
@@ -266,7 +268,18 @@ bool FDS(int totalNodes, int latency, std::vector<node>* nodes){
 			}
 		}
 
-		// Predecessor Force  sort of working
+		std::cout << "Self Forces:" << std::endl;
+		for(i = 0; i < totalNodes; i++){
+			std::cout << (*nodes).at(i).getResult() << " : ";
+			for(j = 0; j < latency; j++){
+				std::cout << (*nodes).at(i).getSelfForce().at(j) << " ";
+			}
+			std::cout << std::endl;
+		}
+
+
+
+		// Predecessor Force  works for everything but mux (z) Heeeeelp
 		std::vector<double> prevDist;
 		for (i = 0; i < totalNodes; i++){
 			// Initializing predecessor forces
@@ -275,32 +288,16 @@ bool FDS(int totalNodes, int latency, std::vector<node>* nodes){
 			}
 
 			if((*nodes).at(i).getPrevNodes().size() != 0){ //if previous forces exist
-				for(j = 0; (unsigned int)j < (*nodes).at(i).getPrevNodes().size(); j++){ //find times each previous incoming node could have been scheduled at
-					// Select the dist based on the distribution
-					if ((*nodes).at(i).getPrevNodes().at(j)->getOperation() == "+" || (*nodes).at(i).getPrevNodes().at(j)->getOperation() == "-"){
-						prevDist = addDist;
-					}
-					else if ((*nodes).at(i).getPrevNodes().at(j)->getOperation() == "*"){  
-						prevDist = mulDist;
-					}
-					else if ((*nodes).at(i).getPrevNodes().at(j)->getOperation() == "/" || (*nodes).at(i).getPrevNodes().at(j)->getOperation() == "%"){  
-						prevDist = divDist;
-					}
-					else{  
-						prevDist = logicDist;
-					}
-
-					//T This probably works lol
-					for(k = (*nodes).at(i).getPrevNodes().at(j)->getAsapTime(); k <= (*nodes).at(i).getPrevNodes().at(j)->getAlapTime(); k++){
-						temp = 0.0;
-						for(time2 = 0; (unsigned int)time2 < prevDist.size(); time2++){
-							if (time2 <= (*nodes).at(i).getPrevNodes().at(j)->getAlapTime() && time2 >= (*nodes).at(i).getPrevNodes().at(j)->getAsapTime()) {	// Only do the ones within time
-								if (k == time2) {
-									temp += prevDist.at(time2) * (1 - ((*nodes).at(i).getPrevNodes().at(j)->getProbability()));
-								}
-								else {
-									temp += prevDist.at(time2) * (0 - ((*nodes).at(i).getPrevNodes().at(j)->getProbability()));
-								}
+				for(j = 0; (unsigned int)j < (*nodes).at(i).getPrevNodes().size(); j++){ //for each previous node
+					//i is current node
+					//j is previous node
+					//k is time frame of curent node
+					//m is distribution index
+					for(k = (*nodes).at(i).getAsapTime(); k <= (*nodes).at(i).getAlapTime(); k++){
+						for(m = (*nodes).at(i).getPrevNodes().at(j)->getAsapTime(); m <= (*nodes).at(i).getPrevNodes().at(j)->getAlapTime(); m++) {	// Only do the ones within time frame of previous node
+							if(m < k && (*nodes).at(i).getPrevNodes().at(j)->getAlapTime() >= (*nodes).at(i).getAsapTime()){
+								temp = (*nodes).at(i).getPredForce().at(k);
+								temp += (*nodes).at(i).getPrevNodes().at(j)->getSelfForce().at(m);
 								(*nodes).at(i).setPredForce(k,temp);
 							}
 						}
@@ -309,7 +306,62 @@ bool FDS(int totalNodes, int latency, std::vector<node>* nodes){
 			}
 		}
 
-		// Successor Force not verified yet
+
+		
+		// Stephanie's broken as fuck Successor Force - noooope
+		for (i = 0; i < totalNodes; i++){
+			// Initializing successor forces
+			for (time = 0; time < latency; time++) {
+				(*nodes).at(i).addSuccForce(0.0);	// This can be 0.
+			}
+
+			if ((*nodes).at(i).getNextNodes().size() != 0){ //if successor forces exist
+				for (j = 0; (unsigned int)j < (*nodes).at(i).getNextNodes().size(); j++){ //for each existing next node
+					//i is current node
+					//j is next node
+					//k is time frame of curent node
+					//time2 is time frame of next node
+					for (k = (*nodes).at(i).getAsapTime(); k <= (*nodes).at(i).getAlapTime(); k++){
+						for (time2 = (*nodes).at(i).getNextNodes().at(j)->getAsapTime(); (unsigned int)time2 < (*nodes).at(i).getNextNodes().at(j)->getAlapTime(); time2++){
+							if (time2 > k && (*nodes).at(i).getNextNodes().at(j)->getAsapTime() <= (*nodes).at(i).getAlapTime()) {
+								temp = (*nodes).at(i).getSuccForce().at(k);
+								temp += (*nodes).at(i).getNextNodes().at(j)->getSelfForce().at(time2);
+								(*nodes).at(i).setSuccForce(k, temp);
+							}
+						}
+					}
+				}
+			}
+		}
+		
+		/* Steph's other, jankier code. is weird. (needs distributions changed if work resumes, was just trying to figure out mux)
+		temp = 0;
+		for(int total = 0; total < totalNodes; total++){
+			if((*nodes).at(total).getPrevNodes().size() != 0){ //do we even have any predecessor forces?
+				for(i = (*nodes).at(total).getAsapTime(); i <= (*nodes).at(total).getAlapTime(); i++){
+					for(j = 0; j < (*nodes).at(total).getPrevNodes().size(); j++){ //go through all previous nodes
+						temp = 0;
+						if(i <= (*nodes).at(total).getPrevNodes().at(j)->getAlapTime()){ //does this node actually effect placement (alap encroaches past asap)
+							for(k = 0; k < latency; k++){
+								if(k >= (*nodes).at(total).getPrevNodes().at(j)->getAsapTime() && k <= (*nodes).at(total).getPrevNodes().at(j)->getAlapTime()){ //inside time frame
+									temp = temp + muxDist.at(k)*(1 - (*nodes).at(total).getPrevNodes().at(j)->getProbability());
+									for(m = (*nodes).at(total).getPrevNodes().at(j)->getAsapTime(); m <= (*nodes).at(total).getPrevNodes().at(j)->getAlapTime(); m++){
+										if(m != k && m > i){
+											temp = temp + muxDist.at(m)*(0 - (*nodes).at(total).getPrevNodes().at(j)->getProbability());
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+			(*nodes).at(total).addSuccForce(temp); //here.... I think.
+		}
+		*/
+
+		/*
+		//Rohin's Janky Successor Force
 		std::vector<double> nextDist;
 		for (i = 0; i < totalNodes; i++){
 			// Initializing successor forces
@@ -351,7 +403,7 @@ bool FDS(int totalNodes, int latency, std::vector<node>* nodes){
 				}
 			}
 		}
-
+		*/
 		/*for (i = 0; (unsigned int)i < (*nodes).size(); i++) {
 			for (time = 0; time < latency; time++) {  //THIS FIXES YOUR SEG FAULT
 				(*nodes).at(i).addSuccForce(0.0);	// This can be 0.
@@ -427,19 +479,29 @@ bool FDS(int totalNodes, int latency, std::vector<node>* nodes){
 				}
 			}
 		}*/
-		for (i = 0; (unsigned int)i < (*nodes).size(); i++) {
-			std::cout << (*nodes).at(i).getResult() << " ";
-			for (j = 0; (unsigned int)j < (*nodes).at(i).getSuccForce().size(); j++) {
-				std::cout << (*nodes).at(i).getSuccForce().at(j) << " ";
+
+		//total force
+		for(i = 0; i < totalNodes; i++){
+			if((*nodes).at(i).getScheduled() == false){
+				for(j = 0; j < latency; j++){
+					temp = (*nodes).at(i).getSelfForce().at(j) + (*nodes).at(i).getSuccForce().at(j) + (*nodes).at(i).getPredForce().at(j);
+					(*nodes).at(i).addTotalForce(temp);
+					if(temp < min){
+						min = temp;
+						k = i;  //k is index of node
+						m = j; //j is time slot node should go in
+					}
+				}
 			}
-			std::cout << std::endl;
 		}
 
 		//schedule least force
+		(*nodes).at(k).setScheduled(true);
+		(*nodes).at(k).setAlapTime(m);	//update timeframe (asap and alap = same number) of scheduled node (or else future pred/succ forces will be off)
+		(*nodes).at(k).setAsapTime(m);
+		(*FDS).at(m).push_back((*nodes).at(k));
 		scheduled++;
 
-		//update timeframe (asap and alap = same number) of scheduled node (or else future pred/succ foces will be off)
-		
 		//check exit condition (all nodes scheduled)
 		if(scheduled == totalNodes){
 			finished = true;
