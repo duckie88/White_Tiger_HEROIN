@@ -1,46 +1,93 @@
 #include "fileOut.h"
 
-void generateIO(std::vector<variable> list, char* outFileStr) {
+void generateIO(std::vector<variable> list, std::ofstream *outFS) {
 	// Variables for string concatenation
 	std::stringstream ss;
 	std::string ioTemp;
 	// Variables for file, appending
-	std::ofstream myFile;
-	myFile.open(outFileStr, std::ios::app);
-	myFile << std::endl;
 	//std::cout << std::endl;
 	// Looping through
 	for (int i = 0; (unsigned int)i < list.size(); i++) {
 		//list[i].getName() << list[i].getType() << list[i].getSIGN() << list[i].getDataSize() 
 		ss = std::stringstream();
-		if (list.at(i).getSIGN() == true) {
-			if (list.at(i).getDataSize() == 1) {
-				ss << list.at(i).getType() << " signed " << list.at(i).getName() << ';' << std::endl;
+		if (list.at(i).getType() == "output") {
+			if (list.at(i).getSIGN() == true) {
+				if (list.at(i).getDataSize() == 1) {
+					ss << list.at(i).getType() << " reg signed " << list.at(i).getName() << ';' << std::endl;
+				}
+				else {
+					ss << list.at(i).getType() << " reg signed [" << list.at(i).getDataSize() - 1 << ":0] " << list.at(i).getName() << ';' << std::endl;
+				}
+				ioTemp = ss.str();
+				//std::cout << ioTemp;
+				(*outFS) << ioTemp;
 			}
 			else {
-				ss << list.at(i).getType() << " signed [" << list.at(i).getDataSize() - 1 << ":0] " << list.at(i).getName() << ';' << std::endl;
+				if (list.at(i).getDataSize() == 1) {
+					ss << list.at(i).getType() << " reg " << list.at(i).getName() << ';' << std::endl;
+				}
+				else {
+					ss << list.at(i).getType() << " reg [" << list.at(i).getDataSize() - 1 << ":0] " << list.at(i).getName() << ';' << std::endl;
+				}
+				ioTemp = ss.str();
+				//std::cout << ioTemp;
+				(*outFS) << ioTemp;
 			}
-			ioTemp = ss.str();
-			//std::cout << ioTemp;
-			myFile << ioTemp;
+		}
+		else if (list.at(i).getType() == "variable") {
+			if (list.at(i).getSIGN() == true) {
+				if (list.at(i).getDataSize() == 1) {
+					ss << "reg signed " << list.at(i).getName() << ';' << std::endl;
+				}
+				else {
+					ss << "reg signed [" << list.at(i).getDataSize() - 1 << ":0] " << list.at(i).getName() << ';' << std::endl;
+				}
+				ioTemp = ss.str();
+				//std::cout << ioTemp;
+				(*outFS) << ioTemp;
+			}
+			else {
+				if (list.at(i).getDataSize() == 1) {
+					ss << "reg " << list.at(i).getName() << ';' << std::endl;
+				}
+				else {
+					ss << "reg [" << list.at(i).getDataSize() - 1 << ":0] " << list.at(i).getName() << ';' << std::endl;
+				}
+				ioTemp = ss.str();
+				//std::cout << ioTemp;
+				(*outFS) << ioTemp;
+			}
 		}
 		else {
-			if (list.at(i).getDataSize() == 1) {
-				ss << list.at(i).getType() << " " << list.at(i).getName() << ';' << std::endl;
+			if (list.at(i).getSIGN() == true) {
+				if (list.at(i).getDataSize() == 1) {
+					ss << list.at(i).getType() << " signed " << list.at(i).getName() << ';' << std::endl;
+				}
+				else {
+					ss << list.at(i).getType() << " signed [" << list.at(i).getDataSize() - 1 << ":0] " << list.at(i).getName() << ';' << std::endl;
+				}
+				ioTemp = ss.str();
+				//std::cout << ioTemp;
+				(*outFS) << ioTemp;
 			}
 			else {
-				ss << list.at(i).getType() << " [" << list.at(i).getDataSize() - 1 << ":0] " << list.at(i).getName() << ';' << std::endl;
+				if (list.at(i).getDataSize() == 1) {
+					ss << list.at(i).getType() << " " << list.at(i).getName() << ';' << std::endl;
+				}
+				else {
+					ss << list.at(i).getType() << " [" << list.at(i).getDataSize() - 1 << ":0] " << list.at(i).getName() << ';' << std::endl;
+				}
+				ioTemp = ss.str();
+				//std::cout << ioTemp;
+				(*outFS) << ioTemp;
 			}
-			ioTemp = ss.str();
-			//std::cout << ioTemp;
-			myFile << ioTemp;
 		}
 	}
-
+	(*outFS) << "input Clk, Rst, Start;" << std::endl;
+	(*outFS) << "output reg Done;" << std::endl;
 	// End and close
-	myFile << std::endl;
+	(*outFS) << std::endl;
 	//std::cout << std::endl;
-	myFile.close();
 }
 
 std::string generateModule(std::string result, std::string oper1, std::string oper2, std::string type, int num, std::vector<variable>ioList) {
@@ -214,7 +261,7 @@ bool generateVerilogFile(std::vector<variable> ioList, std::vector<state> states
 	//std::cout << ioHeaderList.at(ioHeaderList.size() - 1).getName() << " );\n";
 
 	// Generates the list of Input and Outputs
-	generateIO(ioList, outFileStr);
+	generateIO(ioList, &outFS);
 
 	// Generates the list of operations
 	outFS << "reg[";
@@ -235,7 +282,8 @@ bool generateVerilogFile(std::vector<variable> ioList, std::vector<state> states
 	outFS << "if(Rst == 1) begin" << std::endl;
 	outFS << "state <= sWait;" << std::endl;
 	for (i = 0; (unsigned int)i < ioList.size(); i++) {
-		outFS << ioList.at(i).getName() << " <= 0;" << std::endl;
+		if(ioList.at(i).getType() != "input")
+			outFS << ioList.at(i).getName() << " <= 0;" << std::endl;
 	}
 	//for (i = 0; (unsigned int)i < ioList.size(); i++) {
 	//	if(ioList.at(i).getType() == "output")
@@ -304,8 +352,8 @@ void generateStates(std::vector<state> states, std::ofstream *outFS, std::vector
 			else {
 				(*outFS) << "sFinal;" << std::endl;
 			}
-			(*outFS) << "end" << std::endl;
 		}
+		(*outFS) << "end" << std::endl;
 	}
 }
 
