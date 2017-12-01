@@ -9,6 +9,7 @@ int fileRead(char* fileName, std::vector<variable>* variables, std::vector<node>
 	std::string line;
 	std::string word;
 	std::vector<std::string> results;
+	std::vector<bool> repeats;
 	std::string temp;
 	node edge;
 	unsigned int i = 0;
@@ -88,6 +89,7 @@ int fileRead(char* fileName, std::vector<variable>* variables, std::vector<node>
 						(*variables).push_back(variable(results[0], results[i], SIGN, SIZE));
 						(*unscheduledNodes).push_back(node(num));
 						num++;
+						repeats.push_back(false);
 					}
 				}
 			}
@@ -110,6 +112,11 @@ int fileRead(char* fileName, std::vector<variable>* variables, std::vector<node>
 
 				if(results[3] == "?") {
 					if(checkMux(results, *variables, &output, &input1, &input2, &input3)){ //make sure no errors in input
+
+						if (repeats.at(output)) {
+							(*unscheduledNodes).push_back(node((*unscheduledNodes).at(output).getNodeNum()));
+							output = (*unscheduledNodes).size() - 1;
+						}
 
 						//inputs do not count as previous edges, so we need to check whether to set previous nodes or not
 						if((*variables).at(input1).getType() == "input" || (*variables).at(input2).getType() == "input" || (*variables).at(input3).getType() == "input"){
