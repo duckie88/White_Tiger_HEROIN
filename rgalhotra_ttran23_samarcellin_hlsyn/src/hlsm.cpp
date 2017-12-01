@@ -266,7 +266,7 @@ bool FDS(int totalNodes, int latency, std::vector<node>* nodes){
 			}
 		}
 
-		// Predecessor Force  NOT WORKING
+		// Predecessor Force  sort of working
 		std::vector<double> prevDist;
 		for (i = 0; i < totalNodes; i++){
 			// Initializing predecessor forces
@@ -290,7 +290,7 @@ bool FDS(int totalNodes, int latency, std::vector<node>* nodes){
 						prevDist = logicDist;
 					}
 
-					//THIS PART DOESN'T WORK
+					//T This probably works lol
 					for(k = (*nodes).at(i).getPrevNodes().at(j)->getAsapTime(); k <= (*nodes).at(i).getPrevNodes().at(j)->getAlapTime(); k++){
 						temp = 0.0;
 						for(time2 = 0; (unsigned int)time2 < prevDist.size(); time2++){
@@ -309,34 +309,34 @@ bool FDS(int totalNodes, int latency, std::vector<node>* nodes){
 			}
 		}
 
-		//sucessor force   NOT WORKING
+		// Successor Force not verified yet
 		std::vector<double> nextDist;
-		for (i = 0; i < totalNodes; i++) {
-			// Initializing predecessor forces
+		for (i = 0; i < totalNodes; i++){
+			// Initializing successor forces
 			for (time = 0; time < latency; time++) {
 				(*nodes).at(i).addSuccForce(0.0);	// This can be 0.
 			}
 
-			if ((*nodes).at(i).getNextNodes().size() != 0) { //if previous forces exist
-				for (j = 0; (unsigned int)j < (*nodes).at(i).getNextNodes().size(); j++) { //find times each previous incoming node could have been scheduled at
-																						   // Select the dist based on the distribution
-					if ((*nodes).at(i).getNextNodes().at(j)->getOperation() == "+" || (*nodes).at(i).getNextNodes().at(j)->getOperation() == "-") {
+			if ((*nodes).at(i).getNextNodes().size() != 0){ //if successor forces exist
+				for (j = 0; (unsigned int)j < (*nodes).at(i).getNextNodes().size(); j++){ //find times each previous incoming node could have been scheduled at
+					// Select the dist based on the distribution
+					if ((*nodes).at(i).getNextNodes().at(j)->getOperation() == "+" || (*nodes).at(i).getNextNodes().at(j)->getOperation() == "-"){
 						nextDist = addDist;
 					}
-					else if ((*nodes).at(i).getNextNodes().at(j)->getOperation() == "*") {
+					else if ((*nodes).at(i).getNextNodes().at(j)->getOperation() == "*"){
 						nextDist = mulDist;
 					}
-					else if ((*nodes).at(i).getNextNodes().at(j)->getOperation() == "/" || (*nodes).at(i).getNextNodes().at(j)->getOperation() == "%") {
+					else if ((*nodes).at(i).getNextNodes().at(j)->getOperation() == "/" || (*nodes).at(i).getNextNodes().at(j)->getOperation() == "%"){
 						nextDist = divDist;
 					}
-					else {
+					else{
 						nextDist = logicDist;
 					}
 
 					//THIS PART DOESN'T WORK
-					for (k = (*nodes).at(i).getNextNodes().at(j)->getAsapTime(); k <= (*nodes).at(i).getNextNodes().at(j)->getAlapTime(); k++) {
+					for (k = (*nodes).at(i).getNextNodes().at(j)->getAsapTime(); k <= (*nodes).at(i).getNextNodes().at(j)->getAlapTime(); k++){
 						temp = 0.0;
-						for (time2 = 0; (unsigned int)time2 < nextDist.size(); time2++) {
+						for (time2 = 0; (unsigned int)time2 < nextDist.size(); time2++){
 							if (time2 <= (*nodes).at(i).getNextNodes().at(j)->getAlapTime() && time2 >= (*nodes).at(i).getNextNodes().at(j)->getAsapTime()) {	// Only do the ones within time
 								if (k == time2) {
 									temp += nextDist.at(time2) * (1 - ((*nodes).at(i).getNextNodes().at(j)->getProbability()));
@@ -351,6 +351,7 @@ bool FDS(int totalNodes, int latency, std::vector<node>* nodes){
 				}
 			}
 		}
+
 		/*for (i = 0; (unsigned int)i < (*nodes).size(); i++) {
 			for (time = 0; time < latency; time++) {  //THIS FIXES YOUR SEG FAULT
 				(*nodes).at(i).addSuccForce(0.0);	// This can be 0.
