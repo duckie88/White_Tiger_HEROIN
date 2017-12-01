@@ -311,7 +311,47 @@ bool FDS(int totalNodes, int latency, std::vector<node>* nodes){
 
 		//sucessor force   NOT WORKING
 		std::vector<double> nextDist;
-		for (i = 0; (unsigned int)i < (*nodes).size(); i++) {
+		for (i = 0; i < totalNodes; i++) {
+			// Initializing predecessor forces
+			for (time = 0; time < latency; time++) {
+				(*nodes).at(i).addSuccForce(0.0);	// This can be 0.
+			}
+
+			if ((*nodes).at(i).getNextNodes().size() != 0) { //if previous forces exist
+				for (j = 0; (unsigned int)j < (*nodes).at(i).getNextNodes().size(); j++) { //find times each previous incoming node could have been scheduled at
+																						   // Select the dist based on the distribution
+					if ((*nodes).at(i).getNextNodes().at(j)->getOperation() == "+" || (*nodes).at(i).getNextNodes().at(j)->getOperation() == "-") {
+						nextDist = addDist;
+					}
+					else if ((*nodes).at(i).getNextNodes().at(j)->getOperation() == "*") {
+						nextDist = mulDist;
+					}
+					else if ((*nodes).at(i).getNextNodes().at(j)->getOperation() == "/" || (*nodes).at(i).getNextNodes().at(j)->getOperation() == "%") {
+						nextDist = divDist;
+					}
+					else {
+						nextDist = logicDist;
+					}
+
+					//THIS PART DOESN'T WORK
+					for (k = (*nodes).at(i).getNextNodes().at(j)->getAsapTime(); k <= (*nodes).at(i).getNextNodes().at(j)->getAlapTime(); k++) {
+						temp = 0.0;
+						for (time2 = 0; (unsigned int)time2 < nextDist.size(); time2++) {
+							if (time2 <= (*nodes).at(i).getNextNodes().at(j)->getAlapTime() && time2 >= (*nodes).at(i).getNextNodes().at(j)->getAsapTime()) {	// Only do the ones within time
+								if (k == time2) {
+									temp += nextDist.at(time2) * (1 - ((*nodes).at(i).getNextNodes().at(j)->getProbability()));
+								}
+								else {
+									temp += nextDist.at(time2) * (0 - ((*nodes).at(i).getNextNodes().at(j)->getProbability()));
+								}
+								(*nodes).at(i).setSuccForce(k, temp);
+							}
+						}
+					}
+				}
+			}
+		}
+		/*for (i = 0; (unsigned int)i < (*nodes).size(); i++) {
 			for (time = 0; time < latency; time++) {  //THIS FIXES YOUR SEG FAULT
 				(*nodes).at(i).addSuccForce(0.0);	// This can be 0.
 			}
@@ -320,7 +360,7 @@ bool FDS(int totalNodes, int latency, std::vector<node>* nodes){
 					for (k = 0; (unsigned int)k < (*nodes).at(i).getNextNodes().size(); k++) {
 						temp = 0.0;
 						if (j < (*nodes).at(i).getNextNodes().at(k)->getAsapTime()) { //Does ALAP hit ASAP? <- gets hit everytime
-							temp += 0;
+							temp += 0.0;
 						}
 						else {
 							for (x = 0; x < latency; x++) {
@@ -385,14 +425,14 @@ bool FDS(int totalNodes, int latency, std::vector<node>* nodes){
 					}
 				}
 			}
-		}
+		}*/
 		for (i = 0; (unsigned int)i < (*nodes).size(); i++) {
 			std::cout << (*nodes).at(i).getResult() << " ";
 			for (j = 0; (unsigned int)j < (*nodes).at(i).getSuccForce().size(); j++) {
 				std::cout << (*nodes).at(i).getSuccForce().at(j) << " ";
 			}
 			std::cout << std::endl;
-}
+		}
 
 		//schedule least force
 		scheduled++;
