@@ -59,9 +59,9 @@ int main(int argc, char* argv[]) {
 	}
 
 
-	for(i = 0; i < scheduledFDS.size(); i++){
+	for(i = 0; (unsigned int)i < scheduledFDS.size(); i++){
 		std::cout << "time = " << i << ":\t";
-		for(j = 0; j < scheduledFDS.at(i).size(); j++){
+		for(j = 0; (unsigned int)j < scheduledFDS.at(i).size(); j++){
 			std::cout << scheduledFDS.at(i).at(j).getResult() << "\t";
 		}
 		std::cout << std::endl;

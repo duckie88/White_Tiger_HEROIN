@@ -316,7 +316,7 @@ bool FDS(int totalNodes, int latency, std::vector<node>* nodes,  std::vector<std
 					//k is time frame of curent node
 					//time2 is time frame of next node
 					for (k = (*nodes).at(i).getAsapTime(); k <= (*nodes).at(i).getAlapTime(); k++){
-						for (time2 = (*nodes).at(i).getNextNodes().at(j)->getAsapTime(); (unsigned int)time2 < (*nodes).at(i).getNextNodes().at(j)->getAlapTime(); time2++){
+						for (time2 = (*nodes).at(i).getNextNodes().at(j)->getAsapTime(); time2 < (*nodes).at(i).getNextNodes().at(j)->getAlapTime(); time2++){
 							if (time2 > k && (*nodes).at(i).getNextNodes().at(j)->getAsapTime() <= (*nodes).at(i).getAlapTime()) {
 								temp = (*nodes).at(i).getSuccForce().at(k);
 								temp += (*nodes).at(i).getNextNodes().at(j)->getSelfForce().at(time2);
