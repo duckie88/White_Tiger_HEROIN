@@ -333,7 +333,7 @@ bool FDS(int totalNodes, int latency, std::vector<node>* nodes){
 						nextDist = logicDist;
 					}
 
-					//THIS PART DOESN'T WORK
+					// This part MIGHT work
 					for (k = (*nodes).at(i).getNextNodes().at(j)->getAsapTime(); k <= (*nodes).at(i).getNextNodes().at(j)->getAlapTime(); k++){
 						temp = 0.0;
 						for (time2 = 0; (unsigned int)time2 < nextDist.size(); time2++){
