@@ -271,7 +271,7 @@ bool generateVerilogFile(std::vector<variable> ioList, std::vector<state> states
 	// Generates the list of parameters
 	outFS << "parameter sWait = 0,";
 	for (i = 0; (unsigned int)i < states.size(); i++) {
-		outFS << " s" << i + 2 << " = " << i + 1 << ",";
+		outFS << " sTamTran" << i + 2 << " = " << i + 1 << ",";
 	}
 	outFS << " sFinal = " << i + 1 << ";" << std::endl << std::endl;
 
@@ -300,7 +300,7 @@ bool generateVerilogFile(std::vector<variable> ioList, std::vector<state> states
 	outFS << "sWait: begin" << std::endl;
 	outFS << "Done <= 0;" << std::endl;
 	outFS << "if (Start == 1)" << std::endl;
-	outFS << "state <= s2;" << std::endl;
+	outFS << "state <= sTamTran2;" << std::endl;
 	outFS << "else" << std::endl;
 	outFS << "state <= sWait;" << std::endl;
 	outFS << "end" << std::endl;
@@ -333,7 +333,7 @@ void generateStates(std::vector<state> states, std::ofstream *outFS, std::vector
 		exit(EXIT_FAILURE);
 	}
 	for (i = 0; (unsigned int)i < states.size(); i++) {
-		(*outFS) << "s";
+		(*outFS) << "sTamTran";
 		(*outFS) << (i + 2);
 		(*outFS) << ": begin" << std::endl;
 		for (j = 0; (unsigned int)j < states.at(i).getNodes().size(); j++) {
@@ -347,7 +347,7 @@ void generateStates(std::vector<state> states, std::ofstream *outFS, std::vector
 			(*outFS) << "state <= ";
 			
 			if ((unsigned int)i < states.size() - 1) {
-				(*outFS) << "s" << (i + 3) << ";" << std::endl;
+				(*outFS) << "sTamTran" << (i + 3) << ";" << std::endl;
 			}
 			else {
 				(*outFS) << "sFinal;" << std::endl;
