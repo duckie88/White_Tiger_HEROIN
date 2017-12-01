@@ -482,7 +482,19 @@ bool FDS(int totalNodes, int latency, std::vector<node>* nodes,  std::vector<std
 				for(j = 0; j < latency; j++){
 					temp = (*nodes).at(i).getSelfForce().at(j) + (*nodes).at(i).getSuccForce().at(j) + (*nodes).at(i).getPredForce().at(j);
 					(*nodes).at(i).setTotalForce(j, temp);
-					if(temp < min){
+
+					bool prevScheduled = true;
+					for (unsigned int prevIndex = 0; prevIndex < (*nodes).at(i).getPrevNodes().size(); prevIndex++) {
+						if ((*nodes).at(i).getPrevNodes().at(prevIndex)->getScheduled() == false) {	// If previous node not scheduled
+							prevScheduled = false;
+						}
+						if ((*nodes).at(i).getPrevNodes().at(prevIndex)->getScheduled() == true	// If previous node was scheduled
+							&& (*nodes).at(i).getPrevNodes().at(prevIndex)->getAlapTime() == j) { // But the time is the same as the current node, cannot schedule current node
+							prevScheduled = false;
+						}
+					}
+
+					if(temp < min && prevScheduled){
 						min = temp;
 						k = i;  //k is index of node
 						m = j; //j is time slot node should go in
