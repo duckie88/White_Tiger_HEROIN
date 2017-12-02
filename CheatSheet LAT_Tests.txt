@@ -1,0 +1,120 @@
+Cheat sheet only checking of at least ASAP is good. If ASAP test fails,
+then there is not enough latency to even do FDS.
+x = when the node output starts
+<x> = if node output takes more than one state
+
+==============================================================================
+hls1:
+==============================================================================
+input Int16 a, b, c, d, e
+output Int16 i
+variable Int16 f, g, h
+
+f = a + b
+g = f + c
+h = g + d
+i = h + e
+=======================================
+Result:
+Back-to-back dependency, minimum lat required is 4 since +/- delay is 1 cycle.
+t1: f
+t2: g
+t3: h
+t4: i
+==============================================================================
+hls2:
+==============================================================================
+input Int16 a, b, c, d, e
+output Int16 i
+variable Int16 f, g, h
+
+f = a * b
+g = f * c
+h = g * d
+i = h * e
+=======================================
+Result:
+Back-to-back dependency, minimum lat required is 8 since * delay is 2 cycles each.
+t1: f
+t2: <f>
+t3: g
+t4: <g>
+t5: h
+t6: <h>
+t7: i
+t8: <i>
+==============================================================================
+hls3:
+==============================================================================
+input Int16 a, b, c, d, e, f, g, h
+output Int16 i, j, k, l
+
+i = a * b
+j = c * d
+k = e * f
+l = g * h
+=======================================
+Result:
+No dependency, minimum lat required is 2 since * delay is 2 cycles.
+t1: i, j, k, l
+t2: <i, j, k, l>
+
+==============================================================================
+hls4:
+==============================================================================
+input Int16 a, b, c, d, e, f, g
+variable Int16 h, i, k
+output Int16 j, l
+
+h = a + b
+i = h + c 
+j = i + d 
+k = e * f
+l = k * g
+=======================================
+Result:
+Back-to-back dependency of both, minimum lat required is 4 since there are two back-to-back muls
+t1: h, k
+t2: i, <k>
+t3: j, l
+t4: <l>
+==============================================================================
+hls5:
+==============================================================================
+input Int16 a, b, c, d, e, f
+variable Int16 h, i
+output Int16 j, k
+
+h = a * b
+i = h + c 
+j = i * d 
+k = e * f
+=======================================
+Result:
+Back-to-back dependency, minimum lat required is 5 since dependency of 2 mul and 1 add.
+t1: h, k
+t2: <h>, <k>
+t3: i
+t4: j
+t5: <j>
+==============================================================================
+hls6:
+==============================================================================
+input Int16 a, b, c, d, e, f, g
+variable Int16 h, i, j
+output Int16 k, l
+
+h = a * b
+i = c * d
+j = h + i
+k = j / e
+l = f / g
+=======================================
+Result:
+Back-to-back dependency, minimum lat required is 6. 1 Mul, 1 Add, 1 Div
+t1: h, i, l
+t2: <h>, <i>, <l>
+t3: j, <l>
+t4: k
+t5: <k>
+t6: <k>
