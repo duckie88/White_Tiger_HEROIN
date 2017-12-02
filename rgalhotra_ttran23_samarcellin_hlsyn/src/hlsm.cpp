@@ -66,8 +66,17 @@ bool scheduleASAP(unsigned int latency, std::vector<node>* unscheduled, std::vec
 		i++;
 	}
 
+	// Added delay in case mul/div_mod is scheduled on last time slot. Needs to account for the delay needed as well. 
+	bool goodDelay = true;
+	for (unsigned int nodeItr = 0; nodeItr < (*unscheduled).size(); nodeItr++) {
+		int val = ((*unscheduled).at(nodeItr).getAsapTime() + (*unscheduled).at(nodeItr).getDelay());
+		if (val > (int)latency) {
+			goodDelay = false;
+		}
+	}
+
 	// Checking if latency is enough
-	if ((*ASAP).size() > latency) {
+	if ((*ASAP).size() > latency || !goodDelay) {
 		return false;
 	}
 	return true;
@@ -179,8 +188,8 @@ bool scheduleALAP(unsigned int latency, std::vector<node>* unscheduled, std::vec
 // Performs Force Directed Scheduling
 bool FDS(int totalNodes, int latency, std::vector<node>* nodes,  std::vector<std::vector<node>>* FDS){
 	int scheduled = 0;
-	int i, j, k, m, time, time1, time2, x, min;
-	double temp;
+	int i = 0, j = 0, k = 0, m = 0, time = 0, time1 = 0, time2 = 0, x = 0, min = 50000;
+	double temp = 0.0;
 	std::vector<double> mulDist;
 	std::vector<double> divDist;
 	std::vector<double> addDist;
