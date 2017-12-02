@@ -15,50 +15,54 @@ int main(int argc, char* argv[]) {
 	std::vector<state> states;
 	std::vector<std::vector<node>> scheduledASAP, scheduledALAP, scheduledFDS;
 	
-
-	if (argc != 4) {  //check for correct function call
+	// Check for correct function call
+	if (argc != 4) {  
 		std::cout << "\nUSAGE: hlsyn cFile Latency verilogFile\n\n";
 		return EXIT_FAILURE;
 	}
 
-	if (fileRead(argv[1], &unscheduledIO, &unscheduledNodes) == EXIT_FAILURE) {  //read/parse input file
+	// Read and parse input file
+	if (fileRead(argv[1], &unscheduledIO, &unscheduledNodes) == EXIT_FAILURE) {  
 		std::cout << "\nError reading from cFile\n\n";
 		return EXIT_FAILURE;
 	}
 
-	//make the graph
-	if (!scheduleASAP(std::stoi(argv[2]), &unscheduledNodes, &scheduledASAP)) { //do ASAP
+	// Assign ASAP values
+	if (!scheduleASAP(std::stoi(argv[2]), &unscheduledNodes, &scheduledASAP)) { 
 		std::cout << "ASAP schedule exceeds latency provided. Cannot schedule. Error.\n";
 		return EXIT_FAILURE;
 	}
 
-	for(i = 0; (unsigned int)i < unscheduledNodes.size(); i++){ //reset unscheduled nodes for ALAP
+	// Reset unscheduled nodes for ALAP
+	for(i = 0; (unsigned int)i < unscheduledNodes.size(); i++){ 
 		unscheduledNodes.at(i).setScheduled(false);
 		unscheduledNodes.at(i).setCyclesElapsed(-1);
-		//std::cout << unscheduledNodes.at(i).getResult() << "\t" << unscheduledNodes.at(i).getCyclesElapsed() << std::endl;
 	}
 
-	if (!scheduleALAP(std::stoi(argv[2]), &unscheduledNodes, &scheduledALAP)) { //do ALAP
+	// Assign ALAP values
+	if (!scheduleALAP(std::stoi(argv[2]), &unscheduledNodes, &scheduledALAP)) { 
 		std::cout << "ALAP failed to schedule all nodes.\n";
 		return EXIT_FAILURE;
 	}
 
-	for(i = 0; (unsigned int)i < unscheduledNodes.size(); i++){ //reset unscheduled nodes for FDS
+	// Reset unscheduled nodes for ALAP
+	for(i = 0; (unsigned int)i < unscheduledNodes.size(); i++){
 		unscheduledNodes.at(i).setScheduled(false);
 	}
 
-	//set up FDS
+	// Set up FDS
 	for(i = 0; i < std::stoi(argv[2]); i++){
 		scheduledFDS.push_back(std::vector<node>());
 	}
 
-	//do FDS   FINALLY
+	// Perform FDS
 	if (!FDS(unscheduledNodes.size(),std::stoi(argv[2]), &unscheduledNodes, &scheduledFDS)){
 		std::cout << "FDS Error.\n";
 		return EXIT_FAILURE;
 	}
 
 	/*
+	// print FDS
 	for(i = 0; (unsigned int)i < scheduledFDS.size(); i++){
 		std::cout << "time = " << i << ":\t";
 		for(int j = 0; (unsigned int)j < scheduledFDS.at(i).size(); j++){
@@ -68,7 +72,7 @@ int main(int argc, char* argv[]) {
 	}
 	*/
 
-	//output verilog
+	// Output verilog file
 	if (!generateVerilogFile(unscheduledIO, createStates(scheduledFDS), argv[3])) { 
 		std::cout << "Output Error.\n";
 		return EXIT_FAILURE;

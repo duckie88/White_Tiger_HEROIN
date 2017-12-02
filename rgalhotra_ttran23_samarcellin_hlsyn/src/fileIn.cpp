@@ -20,18 +20,21 @@ int fileRead(char* fileName, std::vector<variable>* variables, std::vector<node>
 	bool SIGN = false;
 	int ifElseFlag = 0;
 
-	inFS.open(fileName);//open input file
-	if (!inFS.is_open()) { //check opened correctly
+	// Open input file and check opened correctly
+	inFS.open(fileName);
+	if (!inFS.is_open()) { 
 		std::cout << "Could not open input file." << std::endl;
 		return EXIT_FAILURE;
 	}
 
-	while (!inFS.eof()) { //process file
+	// Parse file
+	while (!inFS.eof()) { 
 		line.clear();
 		getline(inFS, line);
 		inSS.clear();
 		inSS.str(line);
-		if (!line.empty()) { //if line isn't empty (we ignore empty lines)
+		// Check that line isn't empty (we ignore empty lines)
+		if (!line.empty()) { 
 
 			// Splits line into a string vector "results"
 			results.clear();
@@ -206,6 +209,7 @@ bool checkMux(std::vector<std::string> results, std::vector<variable> variables,
 	bool check3 = false;
 	bool check4 = false;
 
+	// Check if output is a valid variable
 	for(i = 0; (unsigned int)i < variables.size(); i++){
 		if( results[0] == variables.at(i).getName()){
 			check1 = true;
@@ -213,6 +217,7 @@ bool checkMux(std::vector<std::string> results, std::vector<variable> variables,
 			break;
 		}
 	}
+	// Check if input1 is a valid variable
 	for(i = 0; (unsigned int)i < variables.size(); i++){
 		if( results[2] == variables.at(i).getName()){
 			check2 = true;
@@ -220,6 +225,7 @@ bool checkMux(std::vector<std::string> results, std::vector<variable> variables,
 			break;
 		}
 	}
+	// Check if input2 is a valid variable
 	for(i = 0; (unsigned int)i < variables.size(); i++){
 		if( results[4] == variables.at(i).getName()){
 			check3 = true;
@@ -227,6 +233,7 @@ bool checkMux(std::vector<std::string> results, std::vector<variable> variables,
 			break;
 		}
 	}
+	// Check if input3 is a valid variable
 	for(i = 0; (unsigned int)i < variables.size(); i++){
 		if( results[6] == variables.at(i).getName()){
 			check4 = true;
@@ -235,6 +242,7 @@ bool checkMux(std::vector<std::string> results, std::vector<variable> variables,
 		}
 	}
 
+	// All variables are valid
 	if( check1 == true && check2 == true && check3 == true && check4 == true ){
 		return true;
 	}
@@ -248,6 +256,7 @@ bool checkOperation(std::vector<std::string> results, std::vector<variable> vari
 	bool check2 = false;
 	bool check3 = false;
 
+	// Check if output is a valid variable
 	for(i = 0; (unsigned int)i < variables.size(); i++){
 		if( results[0] == variables.at(i).getName()){
 			*output = i;
@@ -255,6 +264,7 @@ bool checkOperation(std::vector<std::string> results, std::vector<variable> vari
 			break;
 		}
 	}
+	// Check if input1 is a valid variable
 	for(i = 0; (unsigned int)i < variables.size(); i++){
 		if( results[2] == variables.at(i).getName()){
 			check2 = true;
@@ -262,6 +272,7 @@ bool checkOperation(std::vector<std::string> results, std::vector<variable> vari
 			break;
 		}
 	}
+	// Check if input2 is a valid variable
 	for(i = 0; (unsigned int)i < variables.size(); i++){
 		if( results[4] == variables.at(i).getName()){
 			check3 = true;
@@ -270,6 +281,7 @@ bool checkOperation(std::vector<std::string> results, std::vector<variable> vari
 		}
 	}
 
+	// All variables are valid
 	if( check1 == true && check2 == true && check3 == true ){
 		return true;
 	}
@@ -277,11 +289,9 @@ bool checkOperation(std::vector<std::string> results, std::vector<variable> vari
 	return false;
 }
 
-
 /*
 Get the delay from the operations as per pdf
 "Multipliers have a 2 cycle delay, divider/modulo have a 3 cycle delay, all other resources have a 1 cycle delay"
-
 */
 int findDelay(std::string oper) {
 	if (oper == "/" || oper == "%") {

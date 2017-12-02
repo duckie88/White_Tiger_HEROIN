@@ -62,7 +62,6 @@ void node::setVar3(std::string var3){
 	return;
 }
 
-
 float node::getProbability(){
 	return this->probability;
 }
