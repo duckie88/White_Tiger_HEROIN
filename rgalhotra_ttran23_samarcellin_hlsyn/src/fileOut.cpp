@@ -92,7 +92,6 @@ bool generateVerilogFile(std::vector<variable> ioList, std::vector<state> states
 
 void generateIO(std::vector<variable> list, std::ofstream *outFS) {
 	// Variables for string concatenation
-	std::stringstream ss;
 	std::string ioTemp;
 	
 	// Default HLSM variables
@@ -101,82 +100,66 @@ void generateIO(std::vector<variable> list, std::ofstream *outFS) {
 
 	// Looping through input/output/variables
 	for (int i = 0; (unsigned int)i < list.size(); i++) {
-		ss = std::stringstream();
-		ss << "\t";
+		(*outFS) << "\t";
 		if (list.at(i).getType() == "output") {
 			// If signed value
 			if (list.at(i).getSIGN() == true) {
 				if (list.at(i).getDataSize() == 1) {
-					ss << list.at(i).getType() << " reg signed " << list.at(i).getName() << ';' << std::endl;
+					(*outFS) << list.at(i).getType() << " reg signed " << list.at(i).getName() << ';' << std::endl;
 				}
 				else {
-					ss << list.at(i).getType() << " reg signed [" << list.at(i).getDataSize() - 1 << ":0] " << list.at(i).getName() << ';' << std::endl;
+					(*outFS) << list.at(i).getType() << " reg signed [" << list.at(i).getDataSize() - 1 << ":0] " << list.at(i).getName() << ';' << std::endl;
 				}
-				ioTemp = ss.str();
-				//std::cout << ioTemp;
-				(*outFS) << ioTemp;
 			}
 			// If unsigned value
 			else {
 				if (list.at(i).getDataSize() == 1) {
-					ss << list.at(i).getType() << " reg " << list.at(i).getName() << ';' << std::endl;
+					(*outFS) << list.at(i).getType() << " reg " << list.at(i).getName() << ';' << std::endl;
 				}
 				else {
-					ss << list.at(i).getType() << " reg [" << list.at(i).getDataSize() - 1 << ":0] " << list.at(i).getName() << ';' << std::endl;
+					(*outFS) << list.at(i).getType() << " reg [" << list.at(i).getDataSize() - 1 << ":0] " << list.at(i).getName() << ';' << std::endl;
 				}
-				ioTemp = ss.str();
-				//std::cout << ioTemp;
-				(*outFS) << ioTemp;
 			}
 		}
-		// Not needed, from assignment two, but leaving in just in case.
+		// Not needed, from a(*outFS)ignment two, but leaving in just in case.
 		else if (list.at(i).getType() == "variable") {
 			if (list.at(i).getSIGN() == true) {
 				if (list.at(i).getDataSize() == 1) {
-					ss << "reg signed " << list.at(i).getName() << ';' << std::endl;
+					(*outFS) << "reg signed " << list.at(i).getName() << ';' << std::endl;
 				}
 				else {
-					ss << "reg signed [" << list.at(i).getDataSize() - 1 << ":0] " << list.at(i).getName() << ';' << std::endl;
+					(*outFS) << "reg signed [" << list.at(i).getDataSize() - 1 << ":0] " << list.at(i).getName() << ';' << std::endl;
 				}
-				ioTemp = ss.str();
-				//std::cout << ioTemp;
-				(*outFS) << ioTemp;
 			}
 			else {
 				if (list.at(i).getDataSize() == 1) {
-					ss << "reg " << list.at(i).getName() << ';' << std::endl;
+					(*outFS) << "reg " << list.at(i).getName() << ';' << std::endl;
 				}
 				else {
-					ss << "reg [" << list.at(i).getDataSize() - 1 << ":0] " << list.at(i).getName() << ';' << std::endl;
+					(*outFS) << "reg [" << list.at(i).getDataSize() - 1 << ":0] " << list.at(i).getName() << ';' << std::endl;
 				}
-				ioTemp = ss.str();
 				//std::cout << ioTemp;
-				(*outFS) << ioTemp;
 			}
 		}
 		// Everything else
 		else {
 			if (list.at(i).getSIGN() == true) {
 				if (list.at(i).getDataSize() == 1) {
-					ss << list.at(i).getType() << " signed " << list.at(i).getName() << ';' << std::endl;
+					(*outFS) << list.at(i).getType() << " signed " << list.at(i).getName() << ';' << std::endl;
 				}
 				else {
-					ss << list.at(i).getType() << " signed [" << list.at(i).getDataSize() - 1 << ":0] " << list.at(i).getName() << ';' << std::endl;
+					(*outFS) << list.at(i).getType() << " signed [" << list.at(i).getDataSize() - 1 << ":0] " << list.at(i).getName() << ';' << std::endl;
 				}
-				ioTemp = ss.str();
 				//std::cout << ioTemp;
-				(*outFS) << ioTemp;
 			}
 			else {
 				if (list.at(i).getDataSize() == 1) {
-					ss << list.at(i).getType() << " " << list.at(i).getName() << ';' << std::endl;
+					(*outFS) << list.at(i).getType() << " " << list.at(i).getName() << ';' << std::endl;
 				}
 				else {
-					ss << list.at(i).getType() << " [" << list.at(i).getDataSize() - 1 << ":0] " << list.at(i).getName() << ';' << std::endl;
+					(*outFS) << list.at(i).getType() << " [" << list.at(i).getDataSize() - 1 << ":0] " << list.at(i).getName() << ';' << std::endl;
 				}
-				ioTemp = ss.str();
 				//std::cout << ioTemp;
-				(*outFS) << ioTemp;
 			}
 		}
 	}
