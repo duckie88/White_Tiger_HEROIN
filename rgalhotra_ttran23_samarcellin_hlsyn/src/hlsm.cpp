@@ -291,7 +291,7 @@ bool FDS(int totalNodes, int latency, std::vector<node>* nodes,  std::vector<std
 								//SECRET DEFEAT CODE DON'T LET EPA KNOW
 								prevDist = (*nodes).at(i).getPrevNodes().at(j)->getSelfForce();
 								for (x = 0; (unsigned int)x < prevDist.size(); x++) {
-									(*nodes).at(i).setPredForce(prevDist.at(i), x);
+									(*nodes).at(i).setPredForce(x, prevDist.at(x));
 								}
 								goto cocaine;
 							}
